@@ -12,7 +12,9 @@ const glyphs: Record<string, string[]> = {
 export default function PixelTitle() {
   return (
     <h1 className="pixel-title" aria-label="ODD OBJECTS">
-      {['ODD', 'OBJECTS'].map(word => (
+      {['trail-white', 'trail-pink', 'title-face'].map(layer => (
+        <span className={`title-layer ${layer}`} key={layer} aria-hidden="true">
+        {['ODD', 'OBJECTS'].map(word => (
         <span className="pixel-word" aria-hidden="true" key={word}>
           {Array.from(word).map((letter, index) => (
             <span className="pixel-letter" key={index}>
@@ -21,6 +23,8 @@ export default function PixelTitle() {
               ))}
             </span>
           ))}
+        </span>
+        ))}
         </span>
       ))}
     </h1>

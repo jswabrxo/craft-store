@@ -5,7 +5,6 @@ import { createContext, useContext, useRef, useState, type ReactNode } from 'rea
 type RackPosition = { slug: string; scrollY: number; url: string; focusId?: string };
 type RackSession = {
   saved: string[];
-  liftedProducts: { current: Set<string> };
   toggleSaved: (slug: string) => void;
   position: { current: RackPosition | null };
 };
@@ -14,7 +13,6 @@ const RackSessionContext = createContext<RackSession | null>(null);
 
 export function RackSessionProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<string[]>([]);
-  const liftedProducts = useRef(new Set<string>());
   const position = useRef<RackPosition | null>(null);
 
   function toggleSaved(slug: string) {
@@ -24,7 +22,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <RackSessionContext.Provider value={{ saved, toggleSaved, position, liftedProducts }}>
+    <RackSessionContext.Provider value={{ saved, toggleSaved, position }}>
       {children}
     </RackSessionContext.Provider>
   );

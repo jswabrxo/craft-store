@@ -12,7 +12,7 @@ const shelves = [
   { id: 'shelf-03', label: 'Beaded keychains' },
 ];
 
-export default function RackMenu() {
+export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id: string) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const unlock = useRef<(() => void) | null>(null);
@@ -28,16 +28,10 @@ export default function RackMenu() {
   }, []);
 
   function openMenu() {
-    const scrollY = window.scrollY;
-    const body = document.body;
-    const previousStyle = body.getAttribute('style');
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollY}px`;
-    body.style.width = '100%';
+    const root = document.documentElement;
+    root.classList.add('rack-menu-open');
     unlock.current = () => {
-      if (previousStyle === null) body.removeAttribute('style');
-      else body.setAttribute('style', previousStyle);
-      window.scrollTo({ top: scrollY, behavior: 'instant' });
+      root.classList.remove('rack-menu-open');
       unlock.current = null;
     };
     setOpen(true);
@@ -63,11 +57,7 @@ export default function RackMenu() {
   }
 
   function jumpTo(id: string) {
-    closeMenu(() => {
-      position.current = null;
-      router.push(`/#${id}`);
-      document.getElementById(id)?.scrollIntoView({ block: 'start' });
-    });
+    closeMenu(() => onSectionNavigate(id));
   }
 
   function containFocus(event: KeyboardEvent<HTMLDialogElement>) {
@@ -123,10 +113,10 @@ export default function RackMenu() {
               router.push(`/products/${item.slug}/`);
             });
           }}><span>{item.name}<small>{item.type}</small></span><span>{peso(item.price)}</span></Link>)}
-          <a className="drawer-wishlist" href="#wishlist" onClick={event => {
+          <a className="drawer-wishlist" href="#cart" onClick={event => {
             event.preventDefault();
-            jumpTo('wishlist');
-          }}>Your wishlist <span className="count">{saved.length}</span></a>
+            jumpTo('cart');
+          }}>Your cart <span className="count">{saved.length}</span></a>
         </nav>
       </dialog>
     </>
