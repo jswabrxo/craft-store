@@ -1,23 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { useRackSession } from './rack-session';
+import { useRackSession, useProductColor } from './rack-session';
+import { CartControls, ColorChooser } from './color-controls';
+import { ProductMagnifier } from './product-magnifier';
+import { peso } from '@/lib/products';
 
-export function AddToCart({ slug, name }: { slug: string; name: string }) {
-  const { saved, toggleSaved } = useRackSession();
-  const [message, setMessage] = useState('');
-  const inCart = saved.includes(slug);
+export function ProductDetails({ slug, name: fallbackName, type: fallbackType, price: fallbackPrice }: {
+  slug: string; name: string; type: string; price: number;
+}) {
+  const {catalog}=useRackSession();
+  const item=catalog?.products.find(p=>p.slug===slug);
+  const name=item?.name??fallbackName,type=item?.type??fallbackType,price=item?.price??fallbackPrice;
+  const { options, color, select } = useProductColor(slug);
 
-  return (
+  return <>
+    <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
+    <ProductMagnifier type={type} color={color} />
+    <h1>{name}</h1>
+    <p>{peso(price)} · Sample price</p>
+    <p>{item?.description??"Sample jewelry piece."}</p>
+    <p>{item?.materials}</p><p>{item?.sizing}</p>
     <div className="product-cart">
-      <button className="browse product-cart-button" type="button" aria-pressed={inCart}
-        onClick={() => {
-          toggleSaved(slug);
-          setMessage(inCart ? `${name} was removed` : `${name} was added`);
-        }}>
-        {inCart ? '✓ In cart · Remove' : '+ Add to cart'}
-      </button>
-      <span className="product-cart-status" role="status">{message}</span>
+      <CartControls slug={slug} name={name} color={color} />
     </div>
-  );
+  </>;
 }

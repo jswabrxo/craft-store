@@ -1,0 +1,11 @@
+insert into public.drops(slug,title,brand_name,hero_eyebrow,hero_copy,preorder_details,sample_notice,meta_description,heading_font_key,body_font_key,is_published,is_active,theme,about_copy)
+values('drop-02','MOON POOL','ODD OBJECTS','DROP 02 / THE MOON POOL','Pearls, sea-glass colors and little silver stars. A quiet collection for everyday daydreams.','A small sample collection','AI-generated sample jewelry. No real payments are collected.','Moon Pool — sample pearl and glass-bead jewelry by ODD OBJECTS.','serif','system-sans',true,true,'{"background":"#dceee8","surface":"#f5fff9","accent":"#397b72","ink":"#203f43","sky":"#b8d9e4"}','Moon Pool is our second sample drop. Inspired by tide pools and the soft light of evening, these little objects pair glass beads with pearl shapes and silver-tone stars. Images are AI-generated examples, not photographs of inventory.');
+insert into public.shelves(drop_slug,shelf_code,title,display_order) values('drop-02','01','Pearls / after the tide',1);
+insert into public.products(slug,drop_slug,shelf_code,object_code,name,product_type,price_centavos,description,materials,sizing,display_order) values('moon-pool','drop-02','01','MP—01','Moon Pool','Bracelet',32000,'A delicate circle of pearl-style beads, translucent glass and a silver-tone star. Sample design for Drop 02.','Sample materials: glass beads, pearl-style beads, silver-tone findings','Sample size: 17 cm, adjustable clasp',1);
+insert into public.product_colors(product_slug,slug,name,swatch_hex,image_path,image_alt,display_order,is_visible) values
+('moon-pool','seafoam','Seafoam','#9dc6b5','/images/moon-pool-mint.webp','AI-generated sample seafoam bead and pearl bracelet with a silver star',1,true),
+('moon-pool','lilac','Lilac','#b5a0d1','/images/moon-pool-lilac.webp','AI-generated sample lilac bead and pearl bracelet with a silver star',2,true);
+insert into public.product_images(product_slug,storage_path,alt_text,display_order) values
+('moon-pool','/images/moon-pool-mint.webp','AI-generated sample seafoam bracelet',1),
+('moon-pool','/images/moon-pool-lilac.webp','AI-generated sample lilac bracelet',2);
+update public.drops set is_published=true where slug='drop-01';

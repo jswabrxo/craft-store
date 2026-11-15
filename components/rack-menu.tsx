@@ -19,8 +19,10 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
-  const { saved, position } = useRackSession();
+  const { count, position, catalog } = useRackSession();
   const router = useRouter();
+  const products=catalog?.products??[];
+  const shelves=(catalog?.shelves??[]).map(s=>({id:"shelf-"+s.shelf_code,label:s.title}));
 
   useEffect(() => () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -100,7 +102,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
             event.preventDefault();
             jumpTo(shelf.id);
           }}>{shelf.label}<span aria-hidden="true">→</span></a>)}
-          <h3>Pieces in Drop 01</h3>
+          <h3>Pieces in {catalog?.drop.title}</h3>
           {products.map(item => <Link key={item.slug} href={`/products/${item.slug}/`} onNavigate={event => {
             event.preventDefault();
             closeMenu(() => {
@@ -116,7 +118,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
           <a className="drawer-wishlist" href="#cart" onClick={event => {
             event.preventDefault();
             jumpTo('cart');
-          }}>Your cart <span className="count">{saved.length}</span></a>
+          }}>Your cart <span className="count">{count}</span></a>
         </nav>
       </dialog>
     </>

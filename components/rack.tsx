@@ -1,17 +1,35 @@
 'use client';
 import { useEffect, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
-import { products, peso } from '@/lib/products';
-import { useRackSession } from './rack-session';
-import PixelTitle from './pixel-title';
+import { peso } from '@/lib/products';
+import { CartControls, ColorArt, ColorChooser } from './color-controls';
+import { useProductColor, useRackSession } from './rack-session';
+import { DemoCheckout } from './demo-checkout';
+import { CartIcon } from './cart-icon';
+
 import { RackMotion } from './product-motion';
 import RackMenu from './rack-menu';
 export default function Rack() {
-  const { saved, toggleSaved, position: positionRef } = useRackSession();
-  const [message, setMessage] = useState('');
-  const [notice, setNotice] = useState<{ name: string; id: number } | null>(null);
+  const { catalog, catalogError, cart, count, changeQuantity, position: positionRef } = useRackSession();
+  const products=catalog?.products??[];
+  const drop=catalog?.drop;
   const [compactTitle, setCompactTitle] = useState(false);
-  const cartItems = products.filter(item => saved.includes(item.slug));
+  const cartItems = cart.flatMap(line => {
+    const item = products.find(product => product.slug === line.slug);
+    return item ? [{ ...line, item }] : [];
+  });
+
+  const subtotal = cartItems.reduce((total, line) => total + line.item.price * line.quantity, 0);
+
+  useEffect(() => {
+    const about = document.getElementById('about');
+    if (!about || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      about.dataset.revealed = String(entry.intersectionRatio > 0.5);
+    }, { threshold: 0.501 });
+    observer.observe(about);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const label = document.querySelector('.drop-label');
@@ -24,11 +42,6 @@ export default function Rack() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!notice) return;
-    const timeout = setTimeout(() => setNotice(null), 2300);
-    return () => clearTimeout(timeout);
-  }, [notice]);
   useEffect(() => {
     const previous = positionRef.current;
     if (!previous || window.location.href !== previous.url) return;
@@ -59,45 +72,122 @@ export default function Rack() {
     scrollToSection(id);
   }
 
-  function toggle(slug: string, name: string) {
-    const exists = saved.includes(slug);
-    toggleSaved(slug);
-    setMessage(`${name} ${exists ? 'was removed from your cart' : 'was added'}.`);
-    if (!exists) setNotice(previous => ({ name, id: (previous?.id ?? 0) + 1 }));
-    else if (notice?.name === name) setNotice(null);
+  function removeLine(event: MouseEvent<HTMLButtonElement>, remove: () => void) {
+    const button = event.currentTarget;
+    const row = button.closest('li');
+    if (!row || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      remove();
+      return;
+    }
+    if (row.dataset.removing) return;
+    row.dataset.removing = 'true';
+    row.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 130, fill: 'forwards' })
+      .finished.then(() => {
+        const height = row.getBoundingClientRect().height;
+        return row.animate([
+          { height: `${height}px` },
+          { height: '0px', paddingBlock: 0, borderBottomWidth: 0 },
+        ], { duration: 200, easing: 'ease-out', fill: 'forwards' }).finished;
+      }).then(remove).catch(() => {});
   }
+
   return <main className="mx-auto max-w-3xl">
     <a className="skip" href="#collection" onClick={event => followSection(event, 'collection')}>Skip to collection</a>
-    <nav className="topbar flex items-center justify-between" aria-label="Main"><a href="#cart" onClick={event => followSection(event, 'cart')}>Cart <span className="count">{saved.length}</span></a><span className={`compact-drop${compactTitle ? ' is-visible' : ''}`} aria-hidden="true">DROP 01</span>
-      {notice && <span key={notice.id} className="cart-notice" aria-hidden="true"><span>+</span> {notice.name} was added</span>}
+    <nav className="topbar flex items-center justify-between" aria-label="Main"><a href="#cart" onClick={event => followSection(event, 'cart')}><CartIcon className="nav-cart-icon" /> Cart <span className="count">{count}</span></a><span className={`compact-drop${compactTitle ? ' is-visible' : ''}`} aria-hidden="true"><span className="dynamic-title">{drop?.title}</span></span>
       <RackMenu onSectionNavigate={scrollToSection} /></nav>
     <header className="hero text-center">
-      <p className="eyebrow">THE CLOUD RACK</p>
-      <PixelTitle />
-      <div className="drop-label">DROP 01 / SMALL PREORDER COLLECTION</div>
-      <p className="intro">Beaded bracelets &amp; keychains.<br />Silver-tone charms. Little things to keep close.</p>
-      <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}>Browse Drop 01 <span aria-hidden="true">↓</span></a>
-      <p className="sample">Sample pieces &amp; prices</p>
+      <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
+      <h1 className="dynamic-title">{drop?.title??"ODD OBJECTS"}</h1>
+      <div className="drop-label">{drop?.preorder_details}</div>
+      <p className="intro">{drop?.hero_copy}</p>
+      <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}>Browse {drop?.title??"collection"} <span aria-hidden="true">↓</span></a>
+      <a className="browse about-link" href="#about" onClick={event => followSection(event, 'about')}>About <span aria-hidden="true">↓</span></a>
     </header>
     <div className="rack" id="collection" tabIndex={-1}>
-      <RackMotion />
-      <div className="rack-heading flex justify-between items-center"><h2>Drop 01</h2><span className="mono">06 OBJECTS</span></div>
-      {[['01', 'Bracelets / first picks', products.slice(0, 2)], ['02', 'Bracelets / a little extra', products.slice(2, 4)], ['03', 'Beaded keychains', products.slice(4, 6)]].map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
+      <RackMotion />{catalogError&&<p role="status">{catalogError}</p>}
+      <div className="rack-heading flex justify-between items-center"><h2>{drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
+      {(catalog?.shelves??[]).map(shelf=>[shelf.shelf_code,shelf.title,products.filter(p=>p.shelf===shelf.shelf_code)]).map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
         <h3 id={`shelf-${number}`} tabIndex={-1}><span className="shelf-number">{number as string}</span>{title as string}</h3>
-        <div className="grid grid-cols-2 gap-3 sm:gap-6">{(items as typeof products[number][]).map(item => <article key={item.slug}>
-          <div className="product-visual"><div className="image-box"><span className="object-id mono">OO—{String(products.indexOf(item) + 1).padStart(2, '0')}</span><span className={`shape ${item.type.toLowerCase()}`} aria-hidden="true" /><span>{item.type}</span></div></div>
-          <div className="nameplate"><Link id={`product-link-${item.slug}`} href={`/products/${item.slug}/`} onNavigate={() => { positionRef.current = { slug: item.slug, scrollY: window.scrollY, url: window.location.href }; }}>{item.name}</Link><span>{peso(item.price)}</span></div>
-          <button type="button" className="save-button" aria-pressed={saved.includes(item.slug)} aria-label={`${saved.includes(item.slug) ? 'Remove' : 'Save'} ${item.name} ${saved.includes(item.slug) ? 'from' : 'to'} cart`} onClick={() => toggle(item.slug, item.name)}>{saved.includes(item.slug) ? '✓ In cart · Remove' : '+ Add to cart'}</button>
-        </article>)}</div><div className="shelf-edge" aria-hidden="true" />
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          {(items as import('@/lib/catalog').Product[]).map(item => <RackCard key={item.slug} item={item} />)}
+        </div>
+        <div className="shelf-edge" aria-hidden="true" />
       </section>)}
       <section className="shelf wishlist" id="cart" tabIndex={-1} aria-labelledby="cart-title">
-        <h3 id="cart-title"><span className="shelf-number">04</span>Your cart <span className="count">{saved.length}</span></h3>
-        <div className="tray"><span className="cart-shape" aria-hidden="true">♡</span>{saved.length === 0 ? <div><p>Your cart is empty.</p><p className="muted">Tap “Add to cart” on a piece above.</p></div> : <ul>{cartItems.map(item => <li key={item.slug}><div>{item.name}<span className="muted">{item.type} · {peso(item.price)}</span></div><button onClick={() => toggle(item.slug, item.name)} aria-label={`Remove ${item.name} from cart`}>Remove</button></li>)}</ul>}</div>
-        {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(cartItems.reduce((total, item) => total + item.price, 0))}</strong></p>}
-        <p className="tray-note">Cart is saved for this visit. Online order submission is not available yet.</p><div className="shelf-edge" aria-hidden="true" />
+        <h3 id="cart-title"><span className="shelf-number">04</span>Your cart <span className="count">{count}</span></h3>
+        <div className="tray">
+          <CartIcon className="tray-cart-icon" />
+          {cartItems.length === 0 ? <div><p>Your cart is empty.</p><p className="muted">Tap “Add to cart” on a piece above.</p></div> :
+            <ul>{cartItems.map(({ item, color, quantity }) => (
+              <li className="cart-line" key={`${item.slug}:${color.slug}`}>
+                <div className="cart-thumb"><ColorArt type={item.type} color={color} decorative /></div>
+                <div className="cart-line-info"><strong>{item.name}</strong>
+                  <span><i aria-hidden="true" style={{ color: color.swatch_hex }}>★</i> {color.name} · ×{quantity}</span>
+                </div>
+                <strong>{peso(item.price * quantity)}</strong>
+                <button type="button" aria-label={`Remove ${item.name}, ${color.name}`}
+                  onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}>Remove</button>
+              </li>
+            ))}</ul>}
+        </div>
+        {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
+        <DemoCheckout total={subtotal} />
+        <p className="tray-note">{drop?.sample_notice}</p><div className="shelf-edge" aria-hidden="true" />
       </section>
     </div>
-    <footer className="flex justify-between"><span className="mono">ODD OBJECTS</span><span>Drop 01 · Prototype only</span></footer>
-    <p className="sr-only" role="status" aria-live="polite">{message}</p>
+    <section className="about-panel" id="about" tabIndex={-1} aria-labelledby="about-title">
+      <h2 id="about-title" className="dynamic-title">About {drop?.brand_name}</h2>
+      <p>{drop?.about_copy}</p>
+      <p>{drop?.sample_notice}</p>
+    </section>
+    <footer className="flex justify-between"><span className="mono">ODD OBJECTS</span><span>{drop?.title} · Sample store</span></footer>
   </main>;
+}
+
+function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
+  const { options, color, select } = useProductColor(item.slug);
+  const { position: positionRef } = useRackSession();
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const preview = previewIndex === null ? color : (options[previewIndex] ?? color);
+  const previewing = previewIndex !== null;
+  const colorCount = options.length;
+
+  useEffect(() => {
+    if (!previewing || colorCount < 2) return;
+    const timer = window.setInterval(() => {
+      setPreviewIndex(current => current === null ? null : (current + 1) % colorCount);
+    }, 3200);
+    return () => window.clearInterval(timer);
+  }, [previewing, colorCount]);
+
+  const href = `/products/${item.slug}/`;
+  const linkId = `product-link-${item.slug}`;
+  const imageId = `product-image-${item.slug}`;
+
+  function rememberPosition(focusId: string) {
+    positionRef.current = { slug: item.slug, scrollY: window.scrollY, url: window.location.href, focusId };
+  }
+
+  return <article onPointerEnter={event => {
+    if (event.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches || colorCount < 2) return;
+    setPreviewIndex(Math.max(0, options.findIndex(option => option.slug === color?.slug)));
+  }} onPointerLeave={() => setPreviewIndex(null)}>
+    <div className="rack-visual">
+      <span className="object-id mono">{item.object_code??item.slug}</span>
+      <div className="product-visual">
+        <Link className="image-box image-button" id={imageId} href={href}
+          aria-label={`View ${item.name}`} onNavigate={() => rememberPosition(imageId)}>
+          <div className={previewing && preview?.slug !== color?.slug ? 'rack-color-slide is-preview' : 'rack-color-slide'} key={preview?.slug}>
+            <ColorArt type={item.type} color={preview} decorative />
+          </div>
+        </Link>
+      </div>
+      <div className="rack-colors"><ColorChooser slug={item.slug} name={item.name} options={options} color={preview} select={slug => { setPreviewIndex(null); select(slug); }} /></div>
+    </div>
+    <div className="nameplate">
+      <Link id={linkId} href={href} onNavigate={() => rememberPosition(linkId)}>{item.name}</Link>
+      <span>{peso(item.price)}</span>
+    </div>
+    <CartControls slug={item.slug} name={item.name} color={color} />
+  </article>;
 }

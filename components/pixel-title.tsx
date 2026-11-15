@@ -1,4 +1,10 @@
 const glyphs: Record<string, string[]> = {
+  A: ['01110', '11011', '11011', '11111', '11011', '11011', '11011'],
+  U: ['11011', '11011', '11011', '11011', '11011', '11011', '01110'],
+  R: ['11110', '11011', '11011', '11110', '11100', '11010', '11011'],
+  P: ['11110', '11011', '11011', '11110', '11000', '11000', '11000'],
+  '0': ['01110', '11011', '11011', '11011', '11011', '11011', '01110'],
+  '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
   O: ['01110', '11011', '11011', '11011', '11011', '11011', '01110'],
   D: ['11110', '11011', '11011', '11011', '11011', '11011', '11110'],
   B: ['11110', '11011', '11011', '11110', '11011', '11011', '11110'],
@@ -9,12 +15,14 @@ const glyphs: Record<string, string[]> = {
   S: ['01111', '11000', '11000', '01110', '00011', '00011', '11110'],
 };
 
-export default function PixelTitle() {
+export default function PixelTitle({ compact = false, about = false }: { compact?: boolean; about?: boolean }) {
+  const Title = about ? 'h2' : compact ? 'span' : 'h1';
+  const title = about ? 'ABOUT ODD OBJECTS' : compact ? 'DROP 01' : 'ODD OBJECTS';
   return (
-    <h1 className="pixel-title" aria-label="ODD OBJECTS">
+    <Title id={about ? 'about-title' : undefined} className="pixel-title" aria-label={compact ? undefined : title}>
       {['trail-white', 'trail-pink', 'title-face'].map(layer => (
         <span className={`title-layer ${layer}`} key={layer} aria-hidden="true">
-        {['ODD', 'OBJECTS'].map(word => (
+        {title.split(' ').map(word => (
         <span className="pixel-word" aria-hidden="true" key={word}>
           {Array.from(word).map((letter, index) => (
             <span className="pixel-letter" key={index}>
@@ -27,6 +35,6 @@ export default function PixelTitle() {
         ))}
         </span>
       ))}
-    </h1>
+    </Title>
   );
 }
