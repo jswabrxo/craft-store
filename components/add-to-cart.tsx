@@ -18,8 +18,8 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
     <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
     <ProductGallery key={color?.slug} type={type} color={color} />
     <h1>{name}</h1>
-    <p>{peso(price)} · Sample price</p>
-    <p>{item?.description??"Sample jewelry piece."}</p>
+    <p>{peso(price)} · Price</p>
+    <p>{item?.description??""}</p>
     <p>{item?.materials}</p><p>{item?.sizing}</p>
     <div className="product-cart">
       <CartControls slug={slug} name={name} color={color} />

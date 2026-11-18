@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { parseGoogleFont } from '@/lib/theme-fonts';
+import { parseGoogleFont, googleFontUrl, fontSuggestions } from '@/lib/theme-fonts';
 import { loadCatalog, type Drop, type Shelf, type Product } from '@/lib/catalog';
 import { loadColors, placeholderColors, type ProductColor } from '@/lib/colors';
 
@@ -63,7 +63,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
     const links:HTMLLinkElement[]=[];
     let active=true;
     for(const key of ['heading','body','button','label'] as const){
-      const google=parseGoogleFont(catalog.drop.theme[key+'-google-font']??'');
+      const google=parseGoogleFont(catalog.drop.theme[key+'-google-font'] ?? googleFontUrl(fontSuggestions.find(font=>font.role===key)!.name));
       if(google){
         const link=document.createElement('link');
         link.rel='stylesheet';link.href=google.url;document.head.append(link);links.push(link);

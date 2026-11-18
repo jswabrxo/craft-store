@@ -827,3 +827,17 @@ main:not(.admin-page) .store-form input, main:not(.admin-page) .store-form selec
 main:not(.admin-page) .restock-disclosure>summary { min-height:34px; padding:4px 9px; font-size:12px; }
 main:not(.admin-page) .restock-disclosure .store-form button { min-height:36px; padding:4px 10px; }
 .font-settings { display:grid; gap:10px; }
+
+#collection .product-visual { border:0; box-shadow:none; }
+main:not(.admin-page) .color-chooser button {
+  background:var(--swatch);
+  color:#28232d;
+  text-shadow:0 1px #ffffff85;
+}
+main:not(.admin-page) .color-chooser button[aria-pressed=true] {
+  outline-color:var(--theme-ink);
+}
+.checkout-panel { max-width:520px; padding:12px; border:1px solid color-mix(in srgb,var(--theme-ink) 24%,transparent); border-radius:14px; background:var(--theme-surface); }
+@media (prefers-reduced-motion:no-preference) {
+  .rack-color-slide.is-preview { animation: rack-color-enter 430ms ease-in both; }
+}

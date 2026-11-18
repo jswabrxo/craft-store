@@ -108,7 +108,7 @@ export default function Rack() {
       <RackMotion productKey={products.map(p=>p.slug).join(",")} />{catalogError&&<p role="status">{catalogError}</p>}
       <div className="rack-heading flex justify-between items-center"><h2>{drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
       {(catalog?.shelves??[]).map(shelf=>[shelf.shelf_code,shelf.title,products.filter(p=>p.shelf===shelf.shelf_code)]).map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
-        <h3 id={`shelf-${number}`} tabIndex={-1}><span className="shelf-number">{number as string}</span>{title as string}</h3>
+        <h3 id={`shelf-${number}`} tabIndex={-1}>{title as string}</h3>
         <div className="grid grid-cols-2 gap-3 sm:gap-6">
           {(items as import('@/lib/catalog').Product[]).map(item => <RackCard key={item.slug} item={item} />)}
         </div>
@@ -134,15 +134,15 @@ export default function Rack() {
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
          {drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) && <p role="status">Preorders are closed.</p>}
         <DemoCheckout total={drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal} />
-        <p className="tray-note">{drop?.sample_notice}</p><div className="shelf-edge" aria-hidden="true" />
+        <div className="shelf-edge" aria-hidden="true" />
       </section>
     </div>
     <section className="about-panel" id="about" tabIndex={-1} aria-labelledby="about-title">
       <h2 id="about-title" className="dynamic-title">About {drop?.brand_name}</h2>
       <p>{drop?.about_copy}</p>
-      <p>{drop?.sample_notice}</p>
+
     </section>
-    <footer className="flex justify-between"><span className="mono">ODD OBJECTS</span><span>{drop?.title} · Sample store</span></footer>
+    <footer className="flex justify-between"><span className="mono">ODD OBJECTS</span><span>{drop?.title}</span></footer>
   </main>;
 }
 
@@ -180,7 +180,7 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
       <div className="product-visual">
         <Link className="image-box image-button" id={imageId} href={href}
           aria-label={`View ${item.name}`} onNavigate={() => rememberPosition(imageId)}>
-          <div className={previewing && preview?.slug !== color?.slug ? 'rack-color-slide is-preview' : 'rack-color-slide'} key={preview?.slug}>
+          <div className="rack-color-slide is-preview" key={preview?.slug}>
             <ColorArt type={item.type} color={preview} decorative />
           </div>
         </Link>
