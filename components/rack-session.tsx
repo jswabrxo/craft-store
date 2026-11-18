@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { parseGoogleFont } from '@/lib/theme-fonts';
 import { loadCatalog, type Drop, type Shelf, type Product } from '@/lib/catalog';
 import { loadColors, placeholderColors, type ProductColor } from '@/lib/colors';
 
@@ -57,14 +58,31 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
     const family=catalog.drop.heading_font_key==='serif'?'Georgia,serif':catalog.drop.heading_font_key==='monospace'?'ui-monospace,monospace':'Arial,sans-serif';
     document.documentElement.style.setProperty('--heading-family',family);
     document.documentElement.style.setProperty('--body-family',catalog.drop.body_font_key==='serif'?'Georgia,serif':catalog.drop.body_font_key==='monospace'?'ui-monospace,monospace':'Arial,sans-serif');
+    const root=document.documentElement;
     const faces:FontFace[]=[];
-    for(const [key,path] of [['heading',catalog.drop.heading_font_path],['body',catalog.drop.body_font_path]]){
+    const links:HTMLLinkElement[]=[];
+    let active=true;
+    for(const key of ['heading','body','button','label'] as const){
+      const google=parseGoogleFont(catalog.drop.theme[key+'-google-font']??'');
+      if(google){
+        const link=document.createElement('link');
+        link.rel='stylesheet';link.href=google.url;document.head.append(link);links.push(link);
+        root.style.setProperty('--'+key+'-family','"'+google.name+'", sans-serif');
+        continue;
+      }
+      const path=key==='heading'?catalog.drop.heading_font_path:key==='body'?catalog.drop.body_font_path:null;
       if(!path || !(path.startsWith('https://')||path.startsWith('/')))continue;
-      const face=new FontFace('Store'+key,`url(${JSON.stringify(path)})`);faces.push(face);
-      void face.load().then(loaded=>{document.fonts.add(loaded);document.documentElement.style.setProperty('--'+key+'-family','Store'+key);}).catch(()=>{});
+      const face=new FontFace('Store'+key,`url(${JSON.stringify(path)})`);
+      faces.push(face);
+      void face.load().then(loaded=>{if(active){document.fonts.add(loaded);root.style.setProperty('--'+key+'-family','Store'+key);}}).catch(()=>{});
     }
     document.title=catalog.drop.brand_name+' · '+catalog.drop.title;
     setCart(current=>current.filter(line=>catalog.products.some(p=>p.slug===line.slug)));
+    return ()=>{
+      active=false;links.forEach(link=>link.remove());faces.forEach(face=>document.fonts.delete(face));
+      for(const key of ['heading','body','button','label'])root.style.removeProperty('--'+key+'-family');
+      for(const key of Object.keys(catalog.drop.theme))root.style.removeProperty('--theme-'+key);
+    };
   },[catalog]);
 
   function changeQuantity(slug: string, color: ProductColor, delta: number) {

@@ -105,7 +105,7 @@ export default function Rack() {
       <a className="browse about-link" href="#about" onClick={event => followSection(event, 'about')}>About <span aria-hidden="true">↓</span></a>
     </header>
     <div className="rack" id="collection" tabIndex={-1}>
-      <RackMotion />{catalogError&&<p role="status">{catalogError}</p>}
+      <RackMotion productKey={products.map(p=>p.slug).join(",")} />{catalogError&&<p role="status">{catalogError}</p>}
       <div className="rack-heading flex justify-between items-center"><h2>{drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
       {(catalog?.shelves??[]).map(shelf=>[shelf.shelf_code,shelf.title,products.filter(p=>p.shelf===shelf.shelf_code)]).map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
         <h3 id={`shelf-${number}`} tabIndex={-1}><span className="shelf-number">{number as string}</span>{title as string}</h3>
@@ -115,7 +115,7 @@ export default function Rack() {
         <div className="shelf-edge" aria-hidden="true" />
       </section>)}
       <section className="shelf wishlist" id="cart" tabIndex={-1} aria-labelledby="cart-title">
-        <h3 id="cart-title"><span className="shelf-number">04</span>Your cart <span className="count">{count}</span></h3>
+        <h3 id="cart-title">Your cart <span className="count">{count}</span></h3>
         <div className="tray">
           <CartIcon className="tray-cart-icon" />
           {cartItems.length === 0 ? <div><p>Your cart is empty.</p><p className="muted">Tap “Add to cart” on a piece above.</p></div> :

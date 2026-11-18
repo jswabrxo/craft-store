@@ -2,10 +2,21 @@
 
 import { useEffect } from 'react';
 
-export function RackMotion() {
+export function RackMotion({productKey}:{productKey:string}) {
   useEffect(() => {
     const images = document.querySelectorAll<HTMLElement>('#collection .product-visual');
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const cards=document.querySelectorAll<HTMLElement>('#collection .rack-visual');
+    const observer=typeof IntersectionObserver==='undefined'?null:new IntersectionObserver(entries=>{
+      for(const entry of entries)if(entry.isIntersecting){
+        if(!preference.matches && !entry.target.hasAttribute('data-revealed')){
+          entry.target.setAttribute('data-revealed','');
+          entry.target.animate([{opacity:.45,translate:'0 14px'},{opacity:1,translate:'0 0'}],{duration:400,easing:'ease-out'});
+        }
+        observer?.unobserve(entry.target);
+      }
+    },{threshold:.15});
+    cards.forEach(card=>observer?.observe(card));
     let previousY = window.scrollY;
     let lastScroll = 0;
     let previousFrame = 0;
@@ -49,9 +60,10 @@ export function RackMotion() {
     return () => {
       window.removeEventListener('scroll', onScroll);
       preference.removeEventListener('change', reset);
+      observer?.disconnect();
       reset();
     };
-  }, []);
+  }, [productKey]);
 
   return null;
 }

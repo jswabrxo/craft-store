@@ -6,7 +6,7 @@ import { api } from '@/lib/supabase';
 export function RestockForm({product,color,name}: {product:string;color:string;name:string}) {
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
-  return <details className="restock-disclosure"><summary>Restock list · {name}</summary>
+  return <details className="restock-disclosure"><summary>Want a restock notification?</summary>
     <form className="store-form" onSubmit={async event=>{
       event.preventDefault();
       const email=String(new FormData(event.currentTarget).get('email')).trim().toLowerCase();
@@ -18,8 +18,8 @@ export function RestockForm({product,color,name}: {product:string;color:string;n
         setMessage(error instanceof Error && error.message.includes('duplicate key') ? 'You’re already on the restock list.' : 'Could not save your request. Try again.');
       } finally {setBusy(false);}
     }}>
-      <label>Email for {name}<input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
-      <button disabled={busy}>Join restock list</button><span role="status">{message}</span>
+      <label>Your email <span>· {name}</span><input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
+      <button disabled={busy}>Notify me</button><span role="status">{message}</span>
     </form>
   </details>;
 }
