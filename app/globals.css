@@ -765,3 +765,13 @@ body{font-family:var(--body-family,Arial,sans-serif)}
 .restock-disclosure > summary::before { content: "+" / ""; }
 .restock-disclosure[open] > summary::before { content: "−" / ""; }
 .restock-disclosure > summary:focus-visible { outline: 2px solid #562d60; outline-offset: 3px; }
+
+.rack-editor h3 { margin: 18px 0 8px; }
+.editor-shelf { display: grid; grid-template-columns: repeat(auto-fit,minmax(115px,1fr)); gap: 10px; border-bottom: 5px solid #c4acd7; padding: 10px; background: #f6edf8; }
+.editor-tile { display: grid; gap: 5px; justify-items: center; padding: 9px; border-radius: 14px; border: 1px solid #c4acd7; background: white; }
+.editor-tile[aria-pressed=true] { outline: 2px solid #704881; }
+.editor-tile img, .editor-placeholder { width: 100%; height: 94px; object-fit: contain; border-radius: 8px; background: #f6effa; }
+.editor-placeholder, .editor-add { display:grid; place-items:center; }
+.editor-add { min-height: 100px; border-style: dashed; }
+.editor-swatches { display:flex; gap:5px; }
+.editor-swatches i { width:14px; height:14px; border-radius:50%; border:1px solid #72547d; }

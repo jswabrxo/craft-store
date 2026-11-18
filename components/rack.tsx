@@ -162,7 +162,7 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
     return () => window.clearInterval(timer);
   }, [previewing, colorCount]);
 
-  const href = `/products/${item.slug}/`;
+  const href = `/item/?product=${encodeURIComponent(item.slug)}`;
   const linkId = `product-link-${item.slug}`;
   const imageId = `product-image-${item.slug}`;
 

@@ -103,7 +103,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
             jumpTo(shelf.id);
           }}>{shelf.label}<span aria-hidden="true">→</span></a>)}
           <h3>Pieces in {catalog?.drop.title}</h3>
-          {products.map(item => <Link key={item.slug} href={`/products/${item.slug}/`} onNavigate={event => {
+          {products.map(item => <Link key={item.slug} href={`/item/?product=${encodeURIComponent(item.slug)}`} onNavigate={event => {
             event.preventDefault();
             closeMenu(() => {
               position.current = {
@@ -112,7 +112,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
                 url: window.location.href,
                 focusId: 'rack-menu-trigger',
               };
-              router.push(`/products/${item.slug}/`);
+              router.push(`/item/?product=${encodeURIComponent(item.slug)}`);
             });
           }}><span>{item.name}<small>{item.type}</small></span><span>{peso(item.price)}</span></Link>)}
           <a className="drawer-wishlist" href="#cart" onClick={event => {
