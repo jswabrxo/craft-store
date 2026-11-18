@@ -8,7 +8,7 @@ import { useProductColor, useRackSession } from './rack-session';
 import { DemoCheckout } from './demo-checkout';
 import { CartIcon } from './cart-icon';
 
-import { ClickDecoration, HeroSparkles } from './decorations';
+import { ClickDecoration, FloatingStarBubble, HeroSparkles } from './decorations';
 import { RackMotion } from './product-motion';
 import RackMenu from './rack-menu';
 export default function Rack() {
@@ -99,7 +99,7 @@ export default function Rack() {
       <RackMenu onSectionNavigate={scrollToSection} /></nav>
     <header className="hero text-center">
       <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
-      <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} />
+      <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />
       <div className="drop-label">{drop?.preorder_details}</div>
       <p className="intro">{drop?.hero_copy}</p>
       <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}>Browse {drop?.title??"collection"} <span aria-hidden="true">↓</span></a>
