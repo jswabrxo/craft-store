@@ -23,7 +23,7 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
     <p>{item?.materials}</p><p>{item?.sizing}</p>
     <div className="product-cart">
       <CartControls slug={slug} name={name} color={color} />
-      {color && <RestockForm key={color.slug} product={slug} color={color.slug} name={color.name} />}
+      {color && <RestockForm key={color.slug} product={slug} color={color.slug} />}
     </div>
   </>;
 }

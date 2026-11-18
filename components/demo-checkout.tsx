@@ -11,10 +11,10 @@ export function DemoCheckout({total}:{total:number}){
  try{request.current??=crypto.randomUUID();const result=await rpc('create_store_order',{p_name:form.get('name'),p_email:form.get('email'),p_request_id:request.current,p_contact_platform:platform||null,p_contact_handle:platform?String(form.get('social')??'').trim():null,p_items:cart.map(l=>({slug:l.slug,color:l.color.slug,quantity:l.quantity}))});setOrder(result);setCode(result.code);localStorage.setItem('odd-last-code',result.code);setMode(null);request.current=null;setMessage('Order request saved. Keep your private order code.');}catch(err){setMessage(err instanceof Error?err.message:'Could not save order.');}finally{setBusy(false);}}
  async function lookup(value=code){if(busy)return;setBusy(true);setMessage('');try{const result=await rpc('lookup_sample_order',{p_code:value});setOrder(result);if(!result)setMessage('Order not found. Check the complete code.');}catch{setMessage('Could not check status. Please retry.');}finally{setBusy(false);}}
  return <div className="db-checkout">
- <div className="checkout-actions" aria-label="Order actions">
-   <button disabled={!total||busy} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}>Checkout · {peso(total)}</button>
-   <button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}>Check status</button>
-   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}>View last order</button>
+ <div className="checkout-actions cart-order-actions" aria-label="Order actions">
+   <button className="cart-checkout-primary" disabled={!total||busy} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}>Checkout · {peso(total)}</button>
+   <div className="cart-order-secondary"><button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}>Check status</button>
+   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}>View last order</button></div>
  </div>
  {mode==='checkout'&&total>0&&<form className="store-form checkout-panel" onSubmit={submit}>
    <h3>Order request</h3>

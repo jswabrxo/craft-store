@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/supabase';
 
-export function RestockForm({product,color,name}: {product:string;color:string;name:string}) {
+export function RestockForm({product,color}: {product:string;color:string}) {
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
   return <details className="restock-disclosure"><summary>Want a restock notification?</summary>
@@ -18,7 +18,7 @@ export function RestockForm({product,color,name}: {product:string;color:string;n
         setMessage(error instanceof Error && error.message.includes('duplicate key') ? 'You’re already on the restock list.' : 'Could not save your request. Try again.');
       } finally {setBusy(false);}
     }}>
-      <label>Your email <span>· {name}</span><input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
+      <label>Your email<input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
       <button disabled={busy}>Notify me</button><span role="status">{message}</span>
     </form>
   </details>;
