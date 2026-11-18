@@ -1,14 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { api, projectUrl, publishableKey } from '@/lib/supabase';
 import { colorImageUrl, type ProductColor } from '@/lib/colors';
 
 type Item = { slug:string; name:string; product_type:string; price_centavos:number; shelf_code:string; status:string };
 type Color = ProductColor & { product_slug:string; is_visible:boolean };
 
-export function RackEditor({drop, shelves, products, colors, selected, select, token, reload}: {
+export function RackEditor({drop, shelves, products, colors, selected, select, token, reload, productEditor}: {
   drop:string; shelves:{shelf_code:string;title:string;display_order:number;rack_rank:number|null}[]; products:Item[]; colors:Color[];
-  selected:string; select:(slug:string)=>void; token:string; reload:()=>Promise<unknown>;
+  selected:string; select:(slug:string)=>void; token:string; reload:()=>Promise<unknown>; productEditor:ReactNode;
 }) {
   const [draft, setDraft] = useState<{shelf:string; source?:Item}>();
   const [busy,setBusy]=useState(false);
@@ -36,15 +36,23 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
         form.reset();setMessage('Shelf added.');
       });
     }}><label>Shelf name<input name="title" required maxLength={100}/></label><button disabled={busy}>Add shelf</button></form></details>
-    {shelves.map(shelf=><section key={shelf.shelf_code}><h3>{shelf.title}</h3>
+    {shelves.map((shelf,index)=><section key={shelf.shelf_code}><h3 className="shelf-heading"><span className="shelf-arrows">
+      {([-1,1] as const).map(direction=><button key={direction} type="button" className="admin-action"
+        aria-label={'Move '+shelf.title+(direction<0?' up':' down')}
+        disabled={busy||(direction<0?index===0:index===shelves.length-1)}
+        onClick={()=>void run(async()=>{
+          await api('/rest/v1/rpc/move_store_shelf',{method:'POST',body:JSON.stringify({p_drop:drop,p_shelf:shelf.shelf_code,p_direction:direction})},token);
+          setMessage('Shelf order saved.');
+        })}>{direction<0?'↑':'↓'}</button>)}
+      </span>{shelf.title}</h3>
       <details><summary className="admin-action">Edit shelf</summary>
         <form className="store-form" onSubmit={e=>{
-          e.preventDefault();const f=new FormData(e.currentTarget);const title=String(f.get('title')).trim();const rank=f.get('rank');
+          e.preventDefault();const f=new FormData(e.currentTarget);const title=String(f.get('title')).trim();
           void run(async()=>{if(!title)throw Error('Enter a shelf name.');
-            await api('/rest/v1/shelves?drop_slug=eq.'+encodeURIComponent(drop)+'&shelf_code=eq.'+encodeURIComponent(shelf.shelf_code),{method:'PATCH',body:JSON.stringify({title,rack_rank:rank?Number(rank):null})},token);
+            await api('/rest/v1/shelves?drop_slug=eq.'+encodeURIComponent(drop)+'&shelf_code=eq.'+encodeURIComponent(shelf.shelf_code),{method:'PATCH',body:JSON.stringify({title})},token);
             setMessage('Shelf saved.');
           });
-        }}><label>Name<input name="title" required maxLength={100} defaultValue={shelf.title}/></label><label>Position<input name="rank" type="number" min="1" max="2147483647" defaultValue={shelf.rack_rank??''}/></label><button disabled={busy}>Save shelf</button></form>
+        }}><label>Name<input name="title" required maxLength={100} defaultValue={shelf.title}/></label><button disabled={busy}>Save shelf</button></form>
         {products.some(p=>p.shelf_code===shelf.shelf_code)?<p>Only empty shelves can be deleted.</p>:deleteShelf===shelf.shelf_code?<div>
           <button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{
             await api('/rest/v1/shelves?drop_slug=eq.'+encodeURIComponent(drop)+'&shelf_code=eq.'+encodeURIComponent(shelf.shelf_code),{method:'DELETE'},token);
@@ -62,18 +70,18 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
         </button>;
       })}
       <button className="editor-tile editor-add" type="button" onClick={()=>{select('');setDraft({shelf:shelf.shelf_code});}}>+ Add product</button>
-    </div></section>)}
-    {current&&<div className="checkout-actions">
+    </div>
+    {current?.shelf_code===shelf.shelf_code&&<div className="checkout-actions">
       <button disabled={busy} onClick={()=>{setDraft({shelf:current.shelf_code,source:current});select('');}}>Duplicate</button>
-      {current.status!=='published'&&<button disabled={busy} onClick={()=>void run(async()=>{if(!colors.some(c=>c.product_slug===current.slug&&c.is_visible&&c.image_path))throw Error('Add a product photo to a visible color first.');await status(current.slug,'published');})}>Publish product</button>}
+      {current.status==='published'&&<button disabled={busy} onClick={()=>void run(()=>status(current.slug,'draft'))}>Unpublish product</button>}
+      {current.status==='draft'&&<button disabled={busy} onClick={()=>void run(async()=>{if(!colors.some(c=>c.product_slug===current.slug&&c.is_visible&&c.image_path))throw Error('Add a product photo to a visible color first.');await status(current.slug,'published');})}>Publish product</button>}
       {current.status!=='archived'&&<button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{await status(current.slug,'archived');setUndo({slug:current.slug,status:current.status});select('');})}>Archive product</button>}
       {current.status==='draft'&&<button className="admin-action danger" disabled={busy} onClick={()=>setConfirmDelete(current.slug)}>Delete draft</button>}
       {current.status==='draft'&&confirmDelete===current.slug&&<div><p>Permanently delete {current.name} and its draft colors?</p><button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{await api('/rest/v1/rpc/delete_rack_draft',{method:'POST',body:JSON.stringify({p_slug:current.slug})},token);setConfirmDelete('');select('');setMessage('Draft deleted.');})}>Confirm deletion</button> <button className="admin-action" onClick={()=>setConfirmDelete('')}>Cancel</button></div>}
 
     </div>}
-    {undo&&<button disabled={busy} onClick={()=>void run(async()=>{await status(undo.slug,undo.status);select(undo.slug);setUndo(undefined);})}>Undo archive</button>}
-    <details><summary>Archived products</summary>{products.filter(p=>p.status==='archived').map(p=><div key={p.slug}>{p.name} <button disabled={busy} onClick={()=>void run(async()=>{await status(p.slug,'draft');select(p.slug);})}>Restore as draft</button></div>)}</details>
-    {draft&&<form className="store-form" key={draft.source?.slug??draft.shelf} onSubmit={event=>{
+    {current?.shelf_code===shelf.shelf_code&&productEditor}
+    {draft?.shelf===shelf.shelf_code&&<form className="store-form" key={draft.source?.slug??draft.shelf} onSubmit={event=>{
       event.preventDefault();const fields=new FormData(event.currentTarget);
       void run(async()=>{
         const name=String(fields.get('name')).trim();
@@ -92,6 +100,9 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
       {!draft.source&&<><label>First color<input name="color" required defaultValue="Original"/></label><label>Swatch<input name="swatch" type="color" defaultValue="#a8a0dd"/></label></>}
       <button disabled={busy}>Save draft</button><button type="button" onClick={()=>setDraft(undefined)}>Cancel</button>
     </form>}
+    </section>)}
+    {undo&&<button disabled={busy} onClick={()=>void run(async()=>{await status(undo.slug,undo.status);select(undo.slug);setUndo(undefined);})}>Undo archive</button>}
+    <details><summary>Archived products</summary>{products.filter(p=>p.status==='archived').map(p=><div key={p.slug}>{p.name} <button disabled={busy} onClick={()=>void run(async()=>{await status(p.slug,'draft');select(p.slug);})}>Restore as draft</button></div>)}</details>
     <p role="status">{message}</p>
   </section>;
 }
