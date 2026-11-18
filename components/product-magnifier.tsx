@@ -4,7 +4,7 @@ import { useState, type PointerEvent } from 'react';
 import { ColorArt } from './color-controls';
 import type { ProductColor } from '@/lib/colors';
 
-export function ProductMagnifier({ type, color }: { type: string; color?: ProductColor }) {
+export function ProductMagnifier({ type, color, animate }: { type: string; color?: ProductColor; animate?: boolean }) {
   const [enabled, setEnabled] = useState(false);
 
   function moveLens(event: PointerEvent<HTMLDivElement>) {
@@ -18,7 +18,7 @@ export function ProductMagnifier({ type, color }: { type: string; color?: Produc
   return (
     <div className="image-box magnifier" data-magnifying={enabled || undefined}
       onPointerMove={moveLens} onPointerDown={moveLens}>
-      <div className="magnifier-art"><ColorArt type={type} color={color} /></div>
+      <div key={color?.image_path} className={animate ? "magnifier-art gallery-slide" : "magnifier-art"}><ColorArt type={type} color={color} /></div>
       <div className="magnifier-window" aria-hidden="true">
         <div className="magnifier-art magnifier-zoom"><ColorArt type={type} color={color} decorative /></div>
       </div>
