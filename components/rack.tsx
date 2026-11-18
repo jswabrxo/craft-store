@@ -93,7 +93,7 @@ export default function Rack() {
       }).then(remove).catch(() => {});
   }
 
-  return <main className="storefront-page mx-auto max-w-3xl">
+  return <main className="mx-auto max-w-3xl">
     <a className="skip" href="#collection" onClick={event => followSection(event, 'collection')}>Skip to collection</a>
     <nav className="topbar flex items-center justify-between" aria-label="Main"><a href="#cart" onClick={event => followSection(event, 'cart')}><CartIcon className="nav-cart-icon" /> Cart <span className="count">{count}</span></a><span className={`compact-drop${compactTitle ? ' is-visible' : ''}`} aria-hidden="true"><span className="dynamic-title">{drop?.title}</span></span>
       <RackMenu onSectionNavigate={scrollToSection} /></nav>
@@ -110,7 +110,7 @@ export default function Rack() {
       <div className="rack-heading flex justify-between items-center"><h2>{drop?.theme["rack-heading"]?.trim() || drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
       {(catalog?.shelves??[]).map(shelf=>[shelf.shelf_code,shelf.title,products.filter(p=>p.shelf===shelf.shelf_code)]).map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
         <h3 id={`shelf-${number}`} tabIndex={-1}>{title as string}</h3>
-        <div className="rack-grid">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
           {(items as import('@/lib/catalog').Product[]).map(item => <RackCard key={item.slug} item={item} />)}
         </div>
         <div className="shelf-edge" aria-hidden="true" />
