@@ -1,5 +1,5 @@
 export const fontSuggestions = [
-  {role:'heading', name:'Bricolage Grotesque', vibe:'Playful, offbeat display type'},
+  {role:'heading', name:'Manrope', vibe:'Rounded, clean display sans'},
   {role:'body', name:'DM Sans', vibe:'Clean and easy to read'},
   {role:'button', name:'Space Grotesk', vibe:'Punchy and slightly futuristic'},
   {role:'label', name:'Space Mono', vibe:'Retro inventory tags'},

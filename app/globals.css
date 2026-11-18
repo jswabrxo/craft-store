@@ -841,3 +841,34 @@ main:not(.admin-page) .color-chooser button[aria-pressed=true] {
 @media (prefers-reduced-motion:no-preference) {
   .rack-color-slide.is-preview { animation: rack-color-enter 430ms ease-in both; }
 }
+
+.checkout-panel { width:100%; max-width:none; }
+main:not(.admin-page) .color-chooser button {
+  background:linear-gradient(#ffffff66,#ffffff1a);
+  color:var(--swatch);
+  text-shadow:0 1px 1px #254c3c88;
+  backdrop-filter:blur(3px);
+}
+.hero-title-wrap { position:relative; }
+.hero-sparkles { position:absolute; inset:0; pointer-events:none; }
+.hero-sparkles i { position:absolute; color:var(--theme-accent); opacity:.48; font-style:normal; font-size:clamp(12px,3vw,25px); }
+.hero-sparkles i:nth-child(1) {left:8%;top:4%;--dx:-14px;--dy:-16px;}
+.hero-sparkles i:nth-child(2) {left:15%;bottom:0;--dx:-12px;--dy:10px;animation-delay:.4s;}
+.hero-sparkles i:nth-child(3) {right:9%;top:2%;--dx:15px;--dy:-18px;animation-delay:.8s;}
+.hero-sparkles i:nth-child(4) {right:13%;bottom:6%;--dx:14px;--dy:10px;animation-delay:1.15s;}
+.hero-sparkles i:nth-child(5) {left:48%;top:-17%;--dx:4px;--dy:-12px;animation-delay:1.5s;}
+.background-burst { position:fixed; z-index:30; pointer-events:none; color:var(--theme-accent); font-size:24px; }
+.background-burst[data-effect=ripple] { width:28px; height:28px; border:2px solid var(--theme-accent); border-radius:50%; }
+@media(prefers-reduced-motion:no-preference){
+ .hero-sparkles i { animation:hero-sparkle 3s ease-out infinite both; }
+ .background-burst { animation:background-burst .55s ease-out both; }
+}
+@media(prefers-reduced-motion:reduce){.background-burst{display:none}}
+@keyframes hero-sparkle {0%,100%{opacity:0;transform:scale(.65)} 40%{opacity:.75} 80%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}}
+@keyframes background-burst { from{opacity:.8;transform:translate(-50%,-50%) scale(.4)}to{opacity:0;transform:translate(-50%,-50%) scale(2.4)}}
+main:not(.admin-page) :is(.topbar,.rack-heading,.image-box,.rack-drawer,.nameplate,.tray,.about-panel) {
+ border-color:color-mix(in srgb,var(--theme-shadow-tone,var(--theme-accent)) 35%,white);
+ box-shadow:0 2px 5px color-mix(in srgb,var(--theme-shadow-tone,var(--theme-accent)) 22%,transparent);
+}
+main:not(.admin-page) :is(.rack-drawer,.rack-heading) { color:var(--theme-ink); background:linear-gradient(var(--theme-surface),var(--theme-rack-tone,var(--theme-background))); }
+.cloud-sky i { filter:hue-rotate(275deg) saturate(.55); }

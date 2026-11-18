@@ -8,6 +8,7 @@ import { useProductColor, useRackSession } from './rack-session';
 import { DemoCheckout } from './demo-checkout';
 import { CartIcon } from './cart-icon';
 
+import { ClickDecoration, HeroSparkles } from './decorations';
 import { RackMotion } from './product-motion';
 import RackMenu from './rack-menu';
 export default function Rack() {
@@ -98,7 +99,7 @@ export default function Rack() {
       <RackMenu onSectionNavigate={scrollToSection} /></nav>
     <header className="hero text-center">
       <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
-      <h1 className="dynamic-title">{drop?.title??"ODD OBJECTS"}</h1>
+      <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration effect={drop?.theme["click-effect"]} />
       <div className="drop-label">{drop?.preorder_details}</div>
       <p className="intro">{drop?.hero_copy}</p>
       <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}>Browse {drop?.title??"collection"} <span aria-hidden="true">↓</span></a>
@@ -106,7 +107,7 @@ export default function Rack() {
     </header>
     <div className="rack" id="collection" tabIndex={-1}>
       <RackMotion productKey={products.map(p=>p.slug).join(",")} />{catalogError&&<p role="status">{catalogError}</p>}
-      <div className="rack-heading flex justify-between items-center"><h2>{drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
+      <div className="rack-heading flex justify-between items-center"><h2>{drop?.theme["rack-heading"]?.trim() || drop?.title}</h2><span className="mono">{String(products.length).padStart(2,'0')} OBJECTS</span></div>
       {(catalog?.shelves??[]).map(shelf=>[shelf.shelf_code,shelf.title,products.filter(p=>p.shelf===shelf.shelf_code)]).map(([number, title, items]) => <section className="shelf" key={number as string} aria-labelledby={`shelf-${number}`}>
         <h3 id={`shelf-${number}`} tabIndex={-1}>{title as string}</h3>
         <div className="grid grid-cols-2 gap-3 sm:gap-6">
