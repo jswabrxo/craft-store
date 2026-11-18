@@ -2,8 +2,8 @@
 
 import { useRackSession, useProductColor } from './rack-session';
 import { CartControls, ColorChooser } from './color-controls';
-import { StockBadge } from './stock-badge';
-import { ProductMagnifier } from './product-magnifier';
+import { ProductGallery } from './product-gallery';
+import { RestockForm } from './restock-form';
 import { peso } from '@/lib/products';
 
 export function ProductDetails({ slug, name: fallbackName, type: fallbackType, price: fallbackPrice }: {
@@ -16,13 +16,14 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
 
   return <>
     <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
-    <div className="stock-frame"><ProductMagnifier type={type} color={color} /><StockBadge color={color} /></div>
+    <ProductGallery key={color?.slug} type={type} color={color} />
     <h1>{name}</h1>
     <p>{peso(price)} · Sample price</p>
     <p>{item?.description??"Sample jewelry piece."}</p>
     <p>{item?.materials}</p><p>{item?.sizing}</p>
     <div className="product-cart">
       <CartControls slug={slug} name={name} color={color} />
+      {color && <RestockForm key={color.slug} product={slug} color={color.slug} name={color.name} />}
     </div>
   </>;
 }

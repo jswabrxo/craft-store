@@ -726,3 +726,10 @@ body{font-family:var(--body-family,Arial,sans-serif)}
 .stock-badge { position: absolute; z-index: 3; top: 8px; right: 8px; display: grid; gap: 3px; justify-items: end; pointer-events: none; font-size: 11px; }
 .stock-badge span, .stock-badge strong { padding: 3px 7px; border-radius: 10px; background: var(--theme-surface); border: 1px solid #75968e; color: var(--theme-ink); }
 .stock-badge[data-low=true] strong { background: #fff0ce; color: #703b09; border-color: #ca9a50; }
+
+.stock-badge { top: 2px; gap: 0; }
+.product-gallery { display: grid; grid-template-columns: clamp(44px,12vw,72px) minmax(0,1fr); gap: 8px; }
+.gallery-rail { display: grid; align-content: start; gap: 6px; }
+.gallery-rail button { aspect-ratio: 1; overflow: hidden; border-radius: 12px; border: 2px solid transparent; }
+.gallery-rail button[aria-pressed=true] { border-color: var(--theme-accent); }
+.gallery-rail img { width: 100%; height: 100%; object-fit: cover; }

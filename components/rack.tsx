@@ -132,7 +132,8 @@ export default function Rack() {
             ))}</ul>}
         </div>
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
-        <DemoCheckout total={subtotal} />
+         {drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) && <p role="status">Preorders are closed.</p>}
+        <DemoCheckout total={drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal} />
         <p className="tray-note">{drop?.sample_notice}</p><div className="shelf-edge" aria-hidden="true" />
       </section>
     </div>

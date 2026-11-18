@@ -59,7 +59,7 @@ export function CartControls({ slug, name, color }: {
   const label = `${name}, ${color.name}`;
   const quantity = cart.find(line => line.slug === slug && line.color.slug === color.slug)?.quantity ?? 0;
 
-  const atLimit = quantity >= Math.min(20, color.stock_quantity ?? 20);
+  const atLimit = quantity >= Math.min(20, color.stock_quantity ?? 20, color.preorder_limit ?? 20);
 
   function change(delta: number, event: MouseEvent<HTMLButtonElement>) {
     if (!color) return;
