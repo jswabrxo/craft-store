@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { peso } from '@/lib/products';
 import { StockBadge } from './stock-badge';
@@ -174,7 +174,7 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
     if (event.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches || colorCount < 2) return;
     setPreviewIndex(Math.max(0, options.findIndex(option => option.slug === color?.slug)));
   }} onPointerLeave={() => setPreviewIndex(null)}>
-    <div className="rack-visual">
+    <div className="rack-visual" style={{"--cage-swatch":preview?.swatch_hex} as CSSProperties}>
       <span className="object-id mono">{item.object_code??item.slug}</span>
       <StockBadge color={preview} />
       <div className="product-visual">

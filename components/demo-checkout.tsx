@@ -15,7 +15,7 @@ export function DemoCheckout({total,children}:{total:number;children:ReactNode})
    <div className="cart-tray-content">{children}</div>
    <div className="cart-checkout-reveal" data-open={total>0}>
      <div className="checkout-actions checkout-tray-action">
-   <button className="cart-checkout-primary" disabled={!total||busy} tabIndex={total>0?0:-1} aria-hidden={!total} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}><span className="button-icon" aria-hidden="true">↗</span>Checkout · {peso(total)}</button>
+   <button className="cart-checkout-primary" disabled={!total||busy} tabIndex={total>0?0:-1} aria-hidden={!total} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}>Checkout · {peso(total)}</button>
      </div>
    </div>
  </div>

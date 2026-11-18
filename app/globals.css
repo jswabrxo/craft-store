@@ -1077,3 +1077,17 @@ main.product-page .magnifier-art .color-photo { width:auto;height:auto;max-width
 }
 main:not(.admin-page) .browse { gap:8px; }
 main:not(.admin-page) .rack-drawer nav a:has(>span[aria-hidden=true]) { justify-content:flex-start; }
+
+main:not(.admin-page) .cart-line > button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  white-space:nowrap;
+}
+main:not(.admin-page) .cart-line > button .button-icon { display:inline-block; margin:0; }
+main:not(.admin-page) .rack-visual .image-button {
+  --cage-tint:var(--cage-swatch,var(--theme-rack-tone,var(--theme-surface)));
+  background:linear-gradient(155deg,#ffffff72,transparent 62%),color-mix(in srgb,var(--cage-tint) 28%,transparent);
+  border-color:color-mix(in srgb,var(--cage-tint) 50%,#ffffff30);
+}
