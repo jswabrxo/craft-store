@@ -7,12 +7,13 @@ type Item = { slug:string; name:string; product_type:string; price_centavos:numb
 type Color = ProductColor & { product_slug:string; is_visible:boolean };
 
 export function RackEditor({drop, shelves, products, colors, selected, select, token, reload}: {
-  drop:string; shelves:{shelf_code:string;title:string}[]; products:Item[]; colors:Color[];
+  drop:string; shelves:{shelf_code:string;title:string;display_order:number;rack_rank:number|null}[]; products:Item[]; colors:Color[];
   selected:string; select:(slug:string)=>void; token:string; reload:()=>Promise<unknown>;
 }) {
   const [draft, setDraft] = useState<{shelf:string; source?:Item}>();
   const [busy,setBusy]=useState(false);
   const [message,setMessage]=useState('');
+  const [deleteShelf,setDeleteShelf]=useState('');
   const [confirmDelete,setConfirmDelete]=useState('');
   const [undo,setUndo]=useState<{slug:string;status:string}>();
   async function run(work:()=>Promise<void>) {
@@ -27,7 +28,30 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
   const current=products.find(p=>p.slug===selected);
   return <section className="admin-panel rack-editor">
     <h2>Rack editor</h2>
-    {shelves.map(shelf=><section key={shelf.shelf_code}><h3>{shelf.title}</h3><div className="editor-shelf">
+    <details><summary className="admin-action">+ Add shelf</summary><form className="store-form" onSubmit={e=>{
+      e.preventDefault();const form=e.currentTarget;const title=String(new FormData(form).get('title')).trim();
+      void run(async()=>{if(!title)throw Error('Enter a shelf name.');
+        const display_order=Math.max(0,...shelves.map(s=>s.display_order))+1;
+        await api('/rest/v1/shelves',{method:'POST',body:JSON.stringify({drop_slug:drop,shelf_code:String(display_order).padStart(2,'0'),title,display_order})},token);
+        form.reset();setMessage('Shelf added.');
+      });
+    }}><label>Shelf name<input name="title" required maxLength={100}/></label><button disabled={busy}>Add shelf</button></form></details>
+    {shelves.map(shelf=><section key={shelf.shelf_code}><h3>{shelf.title}</h3>
+      <details><summary className="admin-action">Edit shelf</summary>
+        <form className="store-form" onSubmit={e=>{
+          e.preventDefault();const f=new FormData(e.currentTarget);const title=String(f.get('title')).trim();const rank=f.get('rank');
+          void run(async()=>{if(!title)throw Error('Enter a shelf name.');
+            await api('/rest/v1/shelves?drop_slug=eq.'+encodeURIComponent(drop)+'&shelf_code=eq.'+encodeURIComponent(shelf.shelf_code),{method:'PATCH',body:JSON.stringify({title,rack_rank:rank?Number(rank):null})},token);
+            setMessage('Shelf saved.');
+          });
+        }}><label>Name<input name="title" required maxLength={100} defaultValue={shelf.title}/></label><label>Position<input name="rank" type="number" min="1" max="2147483647" defaultValue={shelf.rack_rank??''}/></label><button disabled={busy}>Save shelf</button></form>
+        {products.some(p=>p.shelf_code===shelf.shelf_code)?<p>Only empty shelves can be deleted.</p>:deleteShelf===shelf.shelf_code?<div>
+          <button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{
+            await api('/rest/v1/shelves?drop_slug=eq.'+encodeURIComponent(drop)+'&shelf_code=eq.'+encodeURIComponent(shelf.shelf_code),{method:'DELETE'},token);
+            setDeleteShelf('');setMessage('Shelf deleted.');
+          })}>Confirm delete shelf</button> <button className="admin-action" onClick={()=>setDeleteShelf('')}>Cancel</button>
+        </div>:<button className="admin-action danger" disabled={busy} onClick={()=>setDeleteShelf(shelf.shelf_code)}>Delete empty shelf</button>}
+      </details><div className="editor-shelf">
       {products.filter(p=>p.shelf_code===shelf.shelf_code && p.status!=='archived').map(p=>{
         const variants=colors.filter(c=>c.product_slug===p.slug);
         const photo=variants.find(c=>c.image_path)?.image_path;
