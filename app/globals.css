@@ -1007,3 +1007,33 @@ main:not(.admin-page) .rack-drawer nav a { min-height:40px; padding-block:5px; l
  radial-gradient(ellipse 30% 39% at 70% 60%,#fff 28%,var(--cloud-tint) 71%,transparent 75%),
  radial-gradient(ellipse 48% 22% at 50% 74%,var(--cloud-tint) 61%,transparent 100%);
 }
+
+/* Fit the primary action to the secondary row while keeping both right-aligned. */
+main:not(.admin-page) .cart-order-actions {
+  grid-template-columns:minmax(0,max-content);
+  justify-content:end;
+  justify-items:stretch;
+}
+main:not(.admin-page) .cart-checkout-primary { width:100%; }
+
+/* Keep the cage translucent and put the glass rim on the photo. */
+main:not(.admin-page) .image-button {
+  background:color-mix(in srgb,var(--theme-surface) 34%,transparent);
+  border:1px solid color-mix(in srgb,var(--theme-rack-tone,var(--theme-surface)) 48%,transparent);
+  box-shadow:none;
+}
+main:not(.admin-page) .image-button .rack-color-slide .color-photo {
+  position:static;
+  width:auto;
+  height:auto;
+  max-width:calc(100% - 12px);
+  max-height:calc(100% - 8px);
+  align-self:center;
+  clip-path:none;
+  border-radius:20px;
+  border:2px solid #ffffffc7;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--theme-detail-tone,var(--theme-accent)) 38%,transparent),
+    0 3px 5px color-mix(in srgb,var(--theme-shadow-tone,var(--theme-accent)) 24%,transparent);
+}
+main:not(.admin-page) .rack-drawer nav a { min-height:46px; padding:10px 16px; }
+main:not(.admin-page) :is(.rack-menu-trigger,.drawer-close) { padding:10px 18px; }
