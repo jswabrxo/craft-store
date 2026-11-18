@@ -3,7 +3,7 @@
 import {useEffect,useState} from 'react';
 
 export function HeroSparkles({enabled}:{enabled:boolean}){
- return enabled?<span className="hero-sparkles" aria-hidden="true">{['✦','✧','✦','✧','✦'].map((shape,i)=><i key={i}>{shape}</i>)}</span>:null;
+ return enabled?<span className="hero-sparkles" aria-hidden="true">{Array.from({length:5},(_,i)=><i className="aero-star" key={i}/>)}</span>:null;
 }
 
 export function ClickDecoration({theme}:{theme?:Record<string,string>}){
@@ -20,5 +20,5 @@ export function ClickDecoration({theme}:{theme?:Record<string,string>}){
   document.addEventListener('click',click);
   return ()=>document.removeEventListener('click',click);
  },[theme]);
- return burst?<span key={burst.id} className="background-burst" data-effect={burst.effect} aria-hidden="true" style={{left:burst.x,top:burst.y}} onAnimationEnd={()=>setBurst(null)}>{burst.effect==='sparkle'?'✦':burst.effect==='bubbles'?<><i/><i/><i/></>:''}</span>:null;
+ return burst?<span key={burst.id} className="background-burst" data-effect={burst.effect} aria-hidden="true" style={{left:burst.x,top:burst.y}} onAnimationEnd={()=>setBurst(null)}>{Array.from({length:burst.effect==='bubbles'?3:1},(_,i)=><i className="aero-star" key={i}/>)}</span>:null;
 }

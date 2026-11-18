@@ -11,5 +11,5 @@ export function makePalette([sky,mint,accent]:[string,string,string]){
  return {sky:mix(sky,'#ffffff',.50),background:mix(mix(sky,mint,.65),'#ffffff',.76),
   surface:mix(mint,'#ffffff',.92),ink:mix(accent,'#08171a',.76),accent:mix(accent,'#101c20',.24),
   'button-tone':mix(mint,sky,.3),'rack-tone':mix(mint,'#ffffff',.6),
-  'shadow-tone':mix(accent,'#ffffff',.34),'hover-tone':mix(sky,accent,.55)};
+  'shadow-tone':mix(accent,'#ffffff',.34),'hover-tone':mix(sky,accent,.55),'detail-tone':mix(accent,'#101c20',.24)};
 }

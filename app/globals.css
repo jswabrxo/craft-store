@@ -895,3 +895,39 @@ main:not(.admin-page) .color-chooser button { border-radius:50%; border-color:va
 .palette-seeds,.palette-preview { width:100%; }
 .palette-preview { padding:10px;border:2px solid;border-radius:14px;display:flex;gap:12px;align-items:center; }
 .palette-preview span { border:1px solid;border-radius:20px;padding:5px 12px; }
+
+main:not(.admin-page) {
+ --control-detail:var(--theme-detail-tone,var(--theme-accent));
+ --dome-face:color-mix(in srgb,var(--theme-button-tone,var(--theme-background)) 73%,var(--control-detail));
+ --dome-rim:color-mix(in srgb,var(--control-detail) 72%,var(--theme-ink));
+}
+main:not(.admin-page) :is(.nav-cart-icon,.tray-cart-icon,.rack-visual>.object-id,.rack-drawer nav h3,.rack-drawer small) { color:var(--control-detail); }
+main:not(.admin-page) :is(.rack-visual>.object-id,.cart-thumb) {
+ border-color:color-mix(in srgb,var(--control-detail) 45%,white);
+ background:linear-gradient(var(--theme-surface),var(--theme-rack-tone,var(--theme-background)));
+}
+main:not(.admin-page) :is(.topbar>a,.rack-menu-trigger,.drawer-close,.rack-drawer nav a,.quantity button,.lens-toggle,.save-button,.restock-disclosure>summary,.browse,.checkout-actions button,.store-form button,.cart-line button) {
+ border:1px solid var(--control-detail); border-radius:999px; color:var(--theme-ink);
+ background:
+ radial-gradient(ellipse 72% 58% at 50% 0%,#fffffff5 2%,#ffffff83 70%,transparent 74%),
+ radial-gradient(ellipse 80% 90% at 50% 30%,var(--dome-face) 50%,var(--dome-rim) 125%);
+ box-shadow:inset 0 1px 2px #fff,inset 0 -3px 5px #163b393b,0 3px 0 var(--control-shadow),0 5px 8px #173f382e;
+}
+main:not(.admin-page) :is(.image-button,.nameplate a,.product-page>a,.rack-drawer nav a,.cart-line button):is(:hover,:focus-visible) {
+ outline:2px solid var(--control-ring);outline-offset:2px;
+}
+main:not(.admin-page) :is(.topbar>a,.rack-menu-trigger,.drawer-close,.rack-drawer nav a,.quantity button,.lens-toggle,.save-button,.restock-disclosure>summary,.browse,.checkout-actions button,.store-form button,.cart-line button,.color-chooser button):not(:disabled):active {
+ translate:0 2px;
+ background:radial-gradient(ellipse at 50% 92%,#ffffff80,transparent 65%),linear-gradient(var(--control-shadow),var(--dome-face));
+ box-shadow:inset 0 3px 6px #143b466e,inset 0 -1px 2px #ffffffb3,0 1px 0 var(--control-shadow);
+}
+main:not(.admin-page) .color-chooser button { border-color:var(--control-detail); }
+.cart-line button { padding-inline:10px; text-decoration:none; }
+.aero-star { clip-path:polygon(50% 0%,62% 35%,99% 36%,70% 59%,80% 95%,50% 73%,20% 95%,30% 59%,1% 36%,38% 35%);background:linear-gradient(145deg,#fff,var(--theme-accent)); }
+.hero-sparkles .aero-star { width:clamp(12px,3vw,25px); aspect-ratio:1; }
+.background-burst[data-effect] { width:28px;height:28px;border:0; }
+.background-burst[data-effect] .aero-star { display:block;position:absolute;width:100%;height:100%;border:0;border-radius:0;background:linear-gradient(145deg,#fff,var(--theme-accent)); }
+.background-burst[data-effect=ripple] .aero-star { background:linear-gradient(145deg,#fff,var(--theme-hover-tone,var(--theme-accent)));opacity:.75; }
+.background-burst[data-effect=bubbles] .aero-star { width:14px;height:14px; }
+.background-burst[data-effect=bubbles] .aero-star:nth-child(2){left:16px;top:8px;width:10px;height:10px}
+.background-burst[data-effect=bubbles] .aero-star:nth-child(3){left:8px;top:20px;width:8px;height:8px}

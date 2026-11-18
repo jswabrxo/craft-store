@@ -24,4 +24,5 @@ export const secondaryTones = {
   'rack-tone':'Rack trim',
   'shadow-tone':'Borders and shadows',
   'hover-tone':'Hover and focus highlight',
+  'detail-tone':'Cart icons, item codes and menu accents',
 };
