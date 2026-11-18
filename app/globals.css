@@ -775,3 +775,13 @@ body{font-family:var(--body-family,Arial,sans-serif)}
 .editor-add { min-height: 100px; border-style: dashed; }
 .editor-swatches { display:flex; gap:5px; }
 .editor-swatches i { width:14px; height:14px; border-radius:50%; border:1px solid #72547d; }
+.admin-jumps { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; overflow-x: auto; background: #f6effa; padding: 8px; border-radius: 12px; margin-bottom: 12px; }
+.admin-page [id] { scroll-margin-top: 68px; }
+.admin-jumps a, .admin-action, .compact-order summary { display:inline-flex; align-items:center; padding:7px 12px; min-height:36px; border:1px solid #b49ac9; border-radius:10px; background:white; color:#543466; white-space:nowrap; cursor:pointer; }
+.admin-action.danger { border-color:#d798a5; color:#84364b; }
+.square-photo { display:grid; gap:6px; min-width:0; }
+.square-photo img { width:min(140px,100%); aspect-ratio:1; object-fit:cover; object-position:center; border-radius:10px; }
+.compact-order { display:block; padding:10px 0; margin:0; }
+.compact-order-header { display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:6px 12px; }
+.compact-order details { margin-top:6px; }
+.admin-page .compact-order p { margin:3px 0; }

@@ -13,6 +13,7 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
   const [draft, setDraft] = useState<{shelf:string; source?:Item}>();
   const [busy,setBusy]=useState(false);
   const [message,setMessage]=useState('');
+  const [confirmDelete,setConfirmDelete]=useState('');
   const [undo,setUndo]=useState<{slug:string;status:string}>();
   async function run(work:()=>Promise<void>) {
     setBusy(true); setMessage('');
@@ -41,7 +42,10 @@ export function RackEditor({drop, shelves, products, colors, selected, select, t
     {current&&<div className="checkout-actions">
       <button disabled={busy} onClick={()=>{setDraft({shelf:current.shelf_code,source:current});select('');}}>Duplicate</button>
       {current.status!=='published'&&<button disabled={busy} onClick={()=>void run(async()=>{if(!colors.some(c=>c.product_slug===current.slug&&c.is_visible&&c.image_path))throw Error('Add a product photo to a visible color first.');await status(current.slug,'published');})}>Publish product</button>}
-      {current.status!=='archived'&&<button disabled={busy} onClick={()=>void run(async()=>{await status(current.slug,'archived');setUndo({slug:current.slug,status:current.status});select('');})}>Archive product</button>}
+      {current.status!=='archived'&&<button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{await status(current.slug,'archived');setUndo({slug:current.slug,status:current.status});select('');})}>Archive product</button>}
+      {current.status==='draft'&&<button className="admin-action danger" disabled={busy} onClick={()=>setConfirmDelete(current.slug)}>Delete draft</button>}
+      {current.status==='draft'&&confirmDelete===current.slug&&<div><p>Permanently delete {current.name} and its draft colors?</p><button className="admin-action danger" disabled={busy} onClick={()=>void run(async()=>{await api('/rest/v1/rpc/delete_rack_draft',{method:'POST',body:JSON.stringify({p_slug:current.slug})},token);setConfirmDelete('');select('');setMessage('Draft deleted.');})}>Confirm deletion</button> <button className="admin-action" onClick={()=>setConfirmDelete('')}>Cancel</button></div>}
+
     </div>}
     {undo&&<button disabled={busy} onClick={()=>void run(async()=>{await status(undo.slug,undo.status);select(undo.slug);setUndo(undefined);})}>Undo archive</button>}
     <details><summary>Archived products</summary>{products.filter(p=>p.status==='archived').map(p=><div key={p.slug}>{p.name} <button disabled={busy} onClick={()=>void run(async()=>{await status(p.slug,'draft');select(p.slug);})}>Restore as draft</button></div>)}</details>
