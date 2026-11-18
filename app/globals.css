@@ -1091,3 +1091,7 @@ main:not(.admin-page) .rack-visual .image-button {
   background:linear-gradient(155deg,#ffffff72,transparent 62%),color-mix(in srgb,var(--cage-tint) 28%,transparent);
   border-color:color-mix(in srgb,var(--cage-tint) 50%,#ffffff30);
 }
+
+main:not(.admin-page) .rack-drawer .drawer-header h2 {
+  font-family:var(--heading-family,system-ui,sans-serif);
+}

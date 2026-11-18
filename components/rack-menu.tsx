@@ -101,7 +101,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
           {shelves.map(shelf => <a key={shelf.id} href={`#${shelf.id}`} onClick={event => {
             event.preventDefault();
             jumpTo(shelf.id);
-          }}><span aria-hidden="true">→</span><span>{shelf.label}</span></a>)}
+          }}><span>{shelf.label}</span></a>)}
           <h3>Pieces in {catalog?.drop.title}</h3>
           {products.map(item => <Link key={item.slug} href={`/item/?product=${encodeURIComponent(item.slug)}`} onNavigate={event => {
             event.preventDefault();
