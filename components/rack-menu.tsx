@@ -94,14 +94,14 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
         }}>
         <div className="drawer-header">
           <h2 id="rack-menu-title">Rack menu</h2>
-          <button type="button" className="drawer-close" onClick={() => closeMenu()}>Close <span aria-hidden="true">×</span></button>
+          <button type="button" className="drawer-close" onClick={() => closeMenu()}><span aria-hidden="true">×</span> Close</button>
         </div>
         <nav aria-label="Rack navigation">
           <h3>Shelves</h3>
           {shelves.map(shelf => <a key={shelf.id} href={`#${shelf.id}`} onClick={event => {
             event.preventDefault();
             jumpTo(shelf.id);
-          }}>{shelf.label}<span aria-hidden="true">→</span></a>)}
+          }}><span aria-hidden="true">→</span><span>{shelf.label}</span></a>)}
           <h3>Pieces in {catalog?.drop.title}</h3>
           {products.map(item => <Link key={item.slug} href={`/item/?product=${encodeURIComponent(item.slug)}`} onNavigate={event => {
             event.preventDefault();

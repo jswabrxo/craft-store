@@ -3,17 +3,20 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { ClickDecoration } from './decorations';
 import { useRackSession } from './rack-session';
 
 export function BackToRack({ slug, shelf }: { slug: string; shelf: string }) {
   const router = useRouter();
-  const { position } = useRackSession();
+  const { position,catalog } = useRackSession();
   const link = useRef<HTMLAnchorElement>(null);
   const leaving = useRef(false);
   const href = `/#shelf-${shelf}`;
 
   return (
-    <Link ref={link} href={href} onNavigate={event => {
+    <>
+    <ClickDecoration theme={catalog?.drop.theme} />
+    <Link className="back-to-rack" ref={link} href={href} onNavigate={event => {
       event.preventDefault();
       if (leaving.current) return;
       leaving.current = true;
@@ -32,7 +35,8 @@ export function BackToRack({ slug, shelf }: { slug: string; shelf: string }) {
       );
       void exit.finished.then(() => { if (panel.isConnected) navigate(); }).catch(() => {});
     }}>
-      ← Back to the rack
+      <span aria-hidden="true">←</span> Back to the rack
     </Link>
+    </>
   );
 }

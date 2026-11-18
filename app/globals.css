@@ -1055,3 +1055,25 @@ main:not(.admin-page) .image-button .rack-color-slide .color-photo {
 @media(prefers-reduced-motion:reduce){.cart-checkout-reveal{transition:none;}}
 .cart-tray-content { display:grid; grid-template-columns:auto minmax(0,1fr); }
 .cart-tray-content > :is(.cart-total,[role=status]) { grid-column:1/-1; }
+
+main.product-page :is(a.back-to-rack,.gallery-rail button) {
+ background:radial-gradient(ellipse at 50% 0%,#fff,#ffffff70 55%,transparent 73%),linear-gradient(var(--theme-surface),var(--theme-button-tone,var(--theme-background)));
+ border:1px solid var(--control-detail);color:var(--theme-ink);
+ box-shadow:inset 0 2px 2px #fff,inset 0 -2px 4px #123c3229,0 3px 0 var(--control-shadow);
+}
+main.product-page a.back-to-rack { display:inline-flex; align-items:center; gap:7px; font:700 13px var(--button-family,var(--body-family)); }
+main.product-page .gallery-rail button { padding:3px;border-radius:15px; }
+main.product-page .gallery-rail button img { border-radius:11px;border:1px solid #ffffffca; }
+main.product-page .gallery-rail button[aria-pressed=true] { border-color:var(--control-ring);outline:2px solid var(--control-ring);outline-offset:1px; }
+main.product-page :is(a.back-to-rack,.gallery-rail button):active { translate:0 2px;box-shadow:inset 0 2px 5px #173b4563,0 1px 0 var(--control-shadow); }
+main.product-page .image-box.magnifier { background:color-mix(in srgb,var(--theme-surface) 42%,transparent);border-radius:36px 36px 18px 18px; }
+main.product-page .magnifier-art { background:transparent; }
+main.product-page .magnifier-art .color-photo { width:auto;height:auto;max-width:calc(100% - 18px);max-height:calc(100% - 12px);border:2px solid #ffffffc7;border-radius:20px;box-shadow:0 2px 5px var(--control-shadow); }
+.button-icon { display:inline-block;margin-inline-end:.45em;line-height:1; }
+.background-burst[data-control=true] { width:14px;height:14px;animation:control-twinkle .38s ease-out both; }
+@keyframes control-twinkle {
+ from {opacity:.65;transform:translate(-50%,-50%) scale(.55);}
+ to {opacity:0;transform:translate(-50%,-105%) scale(1.35);}
+}
+main:not(.admin-page) .browse { gap:8px; }
+main:not(.admin-page) .rack-drawer nav a:has(>span[aria-hidden=true]) { justify-content:flex-start; }

@@ -8,21 +8,22 @@ export function HeroSparkles({enabled}:{enabled:boolean}){
 }
 
 export function ClickDecoration({theme}:{theme?:Record<string,string>}){
- const [burst,setBurst]=useState<{x:number;y:number;id:number;effect:string}|null>(null);
+ const [burst,setBurst]=useState<{x:number;y:number;id:number;effect:string;control:boolean}|null>(null);
  useEffect(()=>{
   if(!theme)return;
   function click(e:MouseEvent){
    if(matchMedia('(prefers-reduced-motion: reduce)').matches||!(e.target instanceof Element)||e.target.closest('input,select,textarea,label,[contenteditable],:disabled'))return;
    const area=e.target.closest('.hero-title-wrap')?'title':e.target.closest('#collection .shelf:not(#cart)')?'shelf':e.target.closest('#collection')?'rack':'';
-   if(!area && e.target.closest('a,button,summary,[role="button"]'))return;
-   const effect=area?(theme?.[area+'-click-effect']??theme?.['click-effect']):theme?.['click-effect'];
+   const control=e.target.closest('button, summary, a.back-to-rack');
+   const effect=control?'sparkle':area?(theme?.[area+'-click-effect']??theme?.['click-effect']):theme?.['click-effect'];
    if(!effect||effect==='off')return;
-   setBurst({x:e.clientX,y:e.clientY,id:performance.now(),effect});
+   const box=control?.getBoundingClientRect();
+   setBurst({x:e.detail||!box?e.clientX:box.left+box.width/2,y:e.detail||!box?e.clientY:box.top+box.height/2,id:performance.now(),effect,control:!!control});
   }
   document.addEventListener('click',click,true);
   return ()=>document.removeEventListener('click',click,true);
  },[theme]);
- return burst?createPortal(<span key={burst.id} className="background-burst" data-effect={burst.effect} aria-hidden="true" style={{left:burst.x,top:burst.y}} onAnimationEnd={()=>setBurst(null)}>{Array.from({length:burst.effect==='bubbles'?3:1},(_,i)=><i className="aero-star" key={i}/>)}</span>,document.body):null;
+ return burst?createPortal(<span key={burst.id} className="background-burst" data-effect={burst.effect} data-control={burst.control} aria-hidden="true" style={{left:burst.x,top:burst.y}} onAnimationEnd={()=>setBurst(null)}>{Array.from({length:burst.effect==='bubbles'?3:1},(_,i)=><i className="aero-star" key={i}/>)}</span>,document.body):null;
 }
 
 export function FloatingStarBubble(){

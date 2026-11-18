@@ -102,8 +102,8 @@ export default function Rack() {
       <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />
       <div className="drop-label">{drop?.preorder_details}</div>
       <p className="intro">{drop?.hero_copy}</p>
-      <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}>Browse {drop?.title??"collection"} <span aria-hidden="true">↓</span></a>
-      <a className="browse about-link" href="#about" onClick={event => followSection(event, 'about')}>About <span aria-hidden="true">↓</span></a>
+      <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}><span aria-hidden="true">↓</span> Browse {drop?.title??"collection"}</a>
+      <a className="browse about-link" href="#about" onClick={event => followSection(event, 'about')}><span aria-hidden="true">↓</span> About</a>
     </header>
     <div className="rack" id="collection" tabIndex={-1}>
       <RackMotion productKey={products.map(p=>p.slug).join(",")} />{catalogError&&<p role="status">{catalogError}</p>}
@@ -128,7 +128,7 @@ export default function Rack() {
                 </div>
                 <strong>{peso(item.price * quantity)}</strong>
                 <button type="button" aria-label={`Remove ${item.name}, ${color.name}`}
-                  onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}>Remove</button>
+                  onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}><span className="button-icon" aria-hidden="true">×</span>Remove</button>
               </li>
             ))}</ul>}
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
