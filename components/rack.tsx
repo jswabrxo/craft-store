@@ -117,7 +117,7 @@ export default function Rack() {
       </section>)}
       <section className="shelf wishlist" id="cart" tabIndex={-1} aria-labelledby="cart-title">
         <h3 id="cart-title">Your cart <span className="count">{count}</span></h3>
-        <div className="tray">
+        <DemoCheckout total={drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal}>
           <CartIcon className="tray-cart-icon" />
           {cartItems.length === 0 ? <div><p>Your cart is empty.</p><p className="muted">Tap “Add to cart” on a piece above.</p></div> :
             <ul>{cartItems.map(({ item, color, quantity }) => (
@@ -131,10 +131,9 @@ export default function Rack() {
                   onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}>Remove</button>
               </li>
             ))}</ul>}
-        </div>
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
          {drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) && <p role="status">Preorders are closed.</p>}
-        <DemoCheckout total={drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal} />
+        </DemoCheckout>
         <div className="shelf-edge" aria-hidden="true" />
       </section>
     </div>

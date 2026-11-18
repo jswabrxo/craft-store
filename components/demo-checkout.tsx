@@ -1,20 +1,27 @@
 'use client';
-import { useState, useRef, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent, type ReactNode } from 'react';
 import { peso } from '@/lib/products';
 import { rpc } from '@/lib/supabase';
 import { useRackSession } from './rack-session';
 type Order={code:string;total_centavos:number;payment_status:string;order_status:string;created_at:string;updated_at?:string};
-export function DemoCheckout({total}:{total:number}){
+export function DemoCheckout({total,children}:{total:number;children:ReactNode}){
  const {cart}=useRackSession();const [mode,setMode]=useState<"checkout"|"status"|null>(null),[platform,setPlatform]=useState(""),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[code,setCode]=useState(''),[order,setOrder]=useState<Order|null>(null);
  const request=useRef<string|null>(null);
  async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();if(busy)return;setBusy(true);setMessage('');const form=new FormData(e.currentTarget);
  try{request.current??=crypto.randomUUID();const result=await rpc('create_store_order',{p_name:form.get('name'),p_email:form.get('email'),p_request_id:request.current,p_contact_platform:platform||null,p_contact_handle:platform?String(form.get('social')??'').trim():null,p_items:cart.map(l=>({slug:l.slug,color:l.color.slug,quantity:l.quantity}))});setOrder(result);setCode(result.code);localStorage.setItem('odd-last-code',result.code);setMode(null);request.current=null;setMessage('Order request saved. Keep your private order code.');}catch(err){setMessage(err instanceof Error?err.message:'Could not save order.');}finally{setBusy(false);}}
  async function lookup(value=code){if(busy)return;setBusy(true);setMessage('');try{const result=await rpc('lookup_sample_order',{p_code:value});setOrder(result);if(!result)setMessage('Order not found. Check the complete code.');}catch{setMessage('Could not check status. Please retry.');}finally{setBusy(false);}}
  return <div className="db-checkout">
- <div className="checkout-actions cart-order-actions" aria-label="Order actions">
-   <button className="cart-checkout-primary" disabled={!total||busy} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}>Checkout · {peso(total)}</button>
-   <div className="cart-order-secondary"><button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}>Check status</button>
-   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}>View last order</button></div>
+ <div className="tray checkout-tray">
+   <div className="cart-tray-content">{children}</div>
+   <div className="cart-checkout-reveal" data-open={total>0}>
+     <div className="checkout-actions checkout-tray-action">
+   <button className="cart-checkout-primary" disabled={!total||busy} tabIndex={total>0?0:-1} aria-hidden={!total} aria-expanded={mode==='checkout'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='checkout'?null:'checkout');}}>Checkout · {peso(total)}</button>
+     </div>
+   </div>
+ </div>
+ <div className="checkout-actions cart-order-links" aria-label="Order actions">
+   <button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}>Check status</button>
+   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}>View last order</button>
  </div>
  {mode==='checkout'&&total>0&&<form className="store-form checkout-panel" onSubmit={submit}>
    <h3>Order request</h3>
