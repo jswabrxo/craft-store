@@ -2,6 +2,7 @@
 import {useState,type FormEvent} from 'react';
 import Link from 'next/link';
 import { SquarePhoto, squareCrop } from '@/components/square-photo';
+import { PaletteMixer } from '@/components/palette-mixer';
 import { fontSuggestions,googleFontUrl,parseGoogleFont,secondaryTones } from '@/lib/theme-fonts';
 import { colorImageUrl } from '@/lib/colors';
 import { RackEditor, uploadRackPhoto } from '@/components/rack-editor';
@@ -49,12 +50,17 @@ export default function Admin(){
  void action(async()=>{if(!slug)throw Error('Use at least one letter A–Z or number in the title.');await api('/rest/v1/rpc/create_store_drop',{method:'POST',body:JSON.stringify({p_slug:slug,p_title:dropTitle})},token);const result=await load();setSelected(result.find(d=>d.slug===slug)??null);setEditing('');setDropTitle('');setMessage('Draft drop created with its first shelf.');});
  }}><label>Drop title<input required maxLength={100} value={dropTitle} onChange={e=>setDropTitle(e.target.value)}/></label><small>A lowercase drop code is generated from the title. Use a distinct title for each drop.</small><button disabled={busy}>Create draft drop</button></form></details>
  {selected&&<form className="store-form" onSubmit={e=>{e.preventDefault();void action(()=>{for(const {role} of fontSuggestions){const value=selected.theme[role+'-google-font'];if(value&&!parseGoogleFont(value))throw Error('Use a Google Fonts CSS2 URL for one family in '+role+'.');}return patch('drops','slug=eq.'+encodeURIComponent(selected.slug),{...selected,preorder_opens_at:selected.preorder_opens_at||null,preorder_closes_at:selected.preorder_closes_at||null});});}}><h3>{selected.slug}</h3>{schedule("preorder_opens_at","Opens at")}{schedule("preorder_closes_at","Closes at")}{field('title','Drop title')}{field('brand_name','Brand')}{field('hero_eyebrow','Eyebrow')}{field('hero_copy','Introduction')}{field('preorder_details','Collection details')}{field('sample_notice','Sample notice')}{field('about_copy','About text')}{field('heading_font_path','Custom title font URL (optional)')}{field('body_font_path','Custom body font URL (optional)')}
+ <PaletteMixer key={selected.slug} apply={palette=>setSelected({...selected,theme:{...selected.theme,...palette}})}/>
  <div className="theme-editor">{['background','surface','accent','ink','sky',...Object.keys(secondaryTones)].map(k=><label key={k}>{secondaryTones[k as keyof typeof secondaryTones]??k}<input type="color" value={selected.theme[k]??selected.theme[k==='shadow-tone'?'accent':'background']??'#ffffff'} onChange={e=>setSelected({...selected,theme:{...selected.theme,[k]:e.target.value}})}/></label>)}</div>
  <fieldset id="decorations" className="font-settings"><legend>Decorations</legend>
   <label>Rack heading<input maxLength={100} placeholder={selected.title} value={selected.theme['rack-heading']??''} onChange={e=>setSelected({...selected,theme:{...selected.theme,'rack-heading':e.target.value}})}/></label>
   <small>Leave blank to use the drop title.</small>
   <label><input type="checkbox" checked={selected.theme['hero-sparkles']!=='off'} onChange={e=>setSelected({...selected,theme:{...selected.theme,'hero-sparkles':e.target.checked?'on':'off'}})}/> Hero sparkles</label>
   <label>Background click effect<select value={selected.theme['click-effect']??'off'} onChange={e=>setSelected({...selected,theme:{...selected.theme,'click-effect':e.target.value}})}><option value="off">Off</option><option value="sparkle">Pixel sparkle</option><option value="ripple">Glass ripple</option></select></label>
+  {(['title','rack','shelf'] as const).map(area=><label key={area}>{area==='title'?'Title':area==='rack'?'Rack':'Shelf'} click effect
+   <select value={selected.theme[area+'-click-effect']??'off'} onChange={e=>setSelected({...selected,theme:{...selected.theme,[area+'-click-effect']:e.target.value}})}>
+    <option value="off">Off</option><option value="sparkle">Pixel sparkle</option><option value="ripple">Glass ripple</option><option value="bubbles">Floating bubbles</option>
+   </select></label>)}
   <small>Effects ignore form fields and buttons and respect reduced motion.</small>
  </fieldset>
  <fieldset className="font-settings"><legend>Decoration fonts</legend>

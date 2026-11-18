@@ -23,4 +23,5 @@ export const secondaryTones = {
   'button-tone':'Button tint',
   'rack-tone':'Rack trim',
   'shadow-tone':'Borders and shadows',
+  'hover-tone':'Hover and focus highlight',
 };
