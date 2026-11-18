@@ -6,7 +6,7 @@ import { api } from '@/lib/supabase';
 export function RestockForm({product,color,name}: {product:string;color:string;name:string}) {
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
-  return <details><summary>Restock list · {name}</summary>
+  return <details className="restock-disclosure"><summary>Restock list · {name}</summary>
     <form className="store-form" onSubmit={async event=>{
       event.preventDefault();
       const email=String(new FormData(event.currentTarget).get('email')).trim().toLowerCase();
