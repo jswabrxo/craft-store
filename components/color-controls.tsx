@@ -59,6 +59,8 @@ export function CartControls({ slug, name, color }: {
   const label = `${name}, ${color.name}`;
   const quantity = cart.find(line => line.slug === slug && line.color.slug === color.slug)?.quantity ?? 0;
 
+  const atLimit = quantity >= Math.min(20, color.stock_quantity ?? 20);
+
   function change(delta: number, event: MouseEvent<HTMLButtonElement>) {
     if (!color) return;
     changeQuantity(slug, color, delta);
@@ -74,9 +76,9 @@ export function CartControls({ slug, name, color }: {
     <div className="quantity" role="group" aria-label={`${label} quantity in cart`}>
       <button type="button" disabled={quantity === 0} aria-label={`Decrease ${label} quantity`} onClick={event => change(-1, event)}>−</button>
       <output aria-label="Quantity">{quantity}</output>
-      <button type="button" disabled={quantity === 99} aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
+      <button type="button" disabled={atLimit} aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
     </div>
-    <button type="button" className="save-button" disabled={quantity === 99} onClick={event => change(1, event)}>+ Add to cart</button>
+    <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : '+ Add to cart'}</button>
     <span className="sr-only" role="status">{notice?.label}</span>
     {notice && createPortal(
       <span key={notice.id} className="cart-notice" aria-hidden="true"

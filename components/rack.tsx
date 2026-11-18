@@ -2,6 +2,7 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { peso } from '@/lib/products';
+import { StockBadge } from './stock-badge';
 import { CartControls, ColorArt, ColorChooser } from './color-controls';
 import { useProductColor, useRackSession } from './rack-session';
 import { DemoCheckout } from './demo-checkout';
@@ -174,6 +175,7 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
   }} onPointerLeave={() => setPreviewIndex(null)}>
     <div className="rack-visual">
       <span className="object-id mono">{item.object_code??item.slug}</span>
+      <StockBadge color={preview} />
       <div className="product-visual">
         <Link className="image-box image-button" id={imageId} href={href}
           aria-label={`View ${item.name}`} onNavigate={() => rememberPosition(imageId)}>

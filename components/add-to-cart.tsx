@@ -2,6 +2,7 @@
 
 import { useRackSession, useProductColor } from './rack-session';
 import { CartControls, ColorChooser } from './color-controls';
+import { StockBadge } from './stock-badge';
 import { ProductMagnifier } from './product-magnifier';
 import { peso } from '@/lib/products';
 
@@ -15,7 +16,7 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
 
   return <>
     <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
-    <ProductMagnifier type={type} color={color} />
+    <div className="stock-frame"><ProductMagnifier type={type} color={color} /><StockBadge color={color} /></div>
     <h1>{name}</h1>
     <p>{peso(price)} · Sample price</p>
     <p>{item?.description??"Sample jewelry piece."}</p>

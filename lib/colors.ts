@@ -7,6 +7,8 @@ export type ProductColor = {
   swatch_hex: string;
   image_path: string | null;
   image_alt: string | null;
+  stock_quantity?: number | null;
+  low_stock_threshold?: number;
 };
 
 export const placeholderColors: ProductColor[] = [
@@ -22,7 +24,7 @@ export function colorImageUrl(path: string) {
 }
 
 export async function loadColors(signal: AbortSignal) {
-  const response = await fetch(projectUrl + '/rest/v1/product_colors?select=product_slug,slug,name,swatch_hex,image_path,image_alt&order=display_order', {
+  const response = await fetch(projectUrl + '/rest/v1/product_colors?select=product_slug,slug,name,swatch_hex,image_path,image_alt,stock_quantity,low_stock_threshold&order=display_order', {
     headers: { apikey: publishableKey }, cache: 'no-store', signal,
   });
   if (!response.ok) throw new Error('Unable to load product colors');

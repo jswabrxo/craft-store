@@ -7,5 +7,7 @@ export const products: Product[] = [
   { slug: 'pocket-noise', shelf: '03', name: 'Pocket Noise', type: 'Keychain', price: 160 },
   { slug: 'lost-satellite', shelf: '03', name: 'Lost Satellite', type: 'Keychain', price: 200 },
   { slug: 'moon-pool', shelf: '01', name: 'Moon Pool', type: 'Bracelet', price: 320 },
+  { slug: 'blue-hour', shelf: '01', name: 'Blue Hour', type: 'Bracelet', price: 350 },
+  { slug: 'honey-signal', shelf: '01', name: 'Honey Signal', type: 'Keychain', price: 240 },
 ];
 export const peso = (amount: number) => `₱${amount}`;

@@ -721,3 +721,8 @@ body{font-family:var(--body-family,Arial,sans-serif)}
 .rack-heading h2,.rack-heading>span,.shelf-number,.intro,.drop-label,.tray-note,.color-chooser{color:var(--theme-ink)}
 .rack-color-slide{min-height:170px}.image-button:has(.color-photo){height:240px}.image-button .rack-color-slide .color-photo{height:100%;object-fit:contain}
 @media(max-width:560px){.image-button:has(.color-photo){height:200px}.rack-color-slide{min-height:130px}}
+
+.stock-frame { position: relative; }
+.stock-badge { position: absolute; z-index: 3; top: 8px; right: 8px; display: grid; gap: 3px; justify-items: end; pointer-events: none; font-size: 11px; }
+.stock-badge span, .stock-badge strong { padding: 3px 7px; border-radius: 10px; background: var(--theme-surface); border: 1px solid #75968e; color: var(--theme-ink); }
+.stock-badge[data-low=true] strong { background: #fff0ce; color: #703b09; border-color: #ca9a50; }
