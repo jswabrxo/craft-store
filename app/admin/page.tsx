@@ -79,8 +79,6 @@ export default function Admin(){
     <small> {vibe}</small></div>;
  })}
  </fieldset><label>Title font<select value={selected.heading_font_key} onChange={e=>setSelected({...selected,heading_font_key:e.target.value})}>{['serif','system-sans','monospace'].map(f=><option key={f}>{f}</option>)}</select></label><label>Body font<select value={selected.body_font_key} onChange={e=>setSelected({...selected,body_font_key:e.target.value})}>{['serif','system-sans','monospace'].map(f=><option key={f}>{f}</option>)}</select></label></div></details><details><summary>Decorations</summary><div className="studio-group"> <fieldset id="decorations" className="font-settings"><legend>Decorations</legend>
-  <label>Brand title image URL<input type="text" inputMode="url" maxLength={1500} pattern="https://.+|/[^/].*" placeholder="https://… or /decorations/wordmark.webp" value={selected.theme['title-image']??'/decorations/wordmark.webp'} onChange={e=>setSelected({...selected,theme:{...selected.theme,'title-image':e.target.value}})}/></label>
-  <small>Use a public image URL, such as a Supabase Storage link. Leave blank to show the brand name as text.</small>
   <label>Rack heading<input maxLength={100} placeholder={selected.title} value={selected.theme['rack-heading']??''} onChange={e=>setSelected({...selected,theme:{...selected.theme,'rack-heading':e.target.value}})}/></label>
   <small>Leave blank to use the drop title.</small>
   <label><input type="checkbox" checked={selected.theme['hero-sparkles']!=='off'} onChange={e=>setSelected({...selected,theme:{...selected.theme,'hero-sparkles':e.target.checked?'on':'off'}})}/> Hero sparkles</label>

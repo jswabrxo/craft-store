@@ -46,7 +46,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
       if (!control || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       control.getAnimations().filter(animation => animation.id === 'game-press').forEach(animation => animation.cancel());
       control.animate([{ scale: '1' }, { scale: '.93', offset: .35 }, { scale: '1.045', offset: .68 }, { scale: '1' }],
-        { duration: 250, easing: 'ease-out', id: 'game-press' });
+        { duration: 250, easing: 'ease-in-out', id: 'game-press' });
     }
     document.addEventListener('click', bounce, true);
     return () => document.removeEventListener('click', bounce, true);

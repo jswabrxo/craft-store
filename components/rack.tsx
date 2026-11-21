@@ -1,6 +1,4 @@
 'use client';
-import {StorefrontLoader} from './storefront-loader';
-import {ActionStar} from './action-star';
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { peso } from '@/lib/products';
@@ -101,7 +99,7 @@ export default function Rack() {
       <RackMenu onSectionNavigate={scrollToSection} /></nav>
     <header className="hero text-center">
       <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
-      <StorefrontLoader ready={Boolean(catalog || catalogError)}/><h1 className="dynamic-title hero-title-wrap"><BrandTitle name={drop?.brand_name??"ODD OBJECTS"} image={drop?.theme["title-image"]??"/decorations/wordmark.webp"}/><HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />
+      <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />
       <div className="drop-label">{drop?.preorder_details}</div>
       <p className="intro">{drop?.hero_copy}</p>
       <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}><span aria-hidden="true">↓</span> Browse {drop?.title??"collection"}</a>
@@ -130,7 +128,7 @@ export default function Rack() {
                 </div>
                 <strong>{peso(item.price * quantity)}</strong>
                 <button type="button" aria-label={`Remove ${item.name}, ${color.name}`}
-                  onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}><ActionStar action="remove"/>Remove</button>
+                  onClick={event => removeLine(event, () => changeQuantity(item.slug, color, -quantity))}><span className="button-icon" aria-hidden="true">×</span>Remove</button>
               </li>
             ))}</ul>}
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
@@ -195,13 +193,4 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
     </div>
     <CartControls slug={item.slug} name={item.name} color={color} />
   </article>;
-}
-
-
-function BrandTitle({name,image}:{name:string;image?:string}) {
-  const [failed,setFailed]=useState<string>();
-  const source=image?.trim();
-  return source && source!==failed && /^(https:\/\/|\/(?!\/))/.test(source)
-    ? <img className="brand-wordmark" src={source} alt={name} onError={()=>setFailed(source)}/>
-    : <>{name}</>;
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import {ActionStar} from './action-star';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
@@ -36,7 +35,7 @@ export function BackToRack({ slug, shelf }: { slug: string; shelf: string }) {
       );
       void exit.finished.then(() => { if (panel.isConnected) navigate(); }).catch(() => {});
     }}>
-      <ActionStar action="back"/>Back to the rack
+      <span aria-hidden="true">←</span> Back to the rack
     </Link>
     </>
   );

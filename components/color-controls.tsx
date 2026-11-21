@@ -2,7 +2,6 @@
 
 /* Supabase product photos are already sized and served by Storage. */
 /* eslint-disable @next/next/no-img-element */
-import {ActionStar} from './action-star';
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { colorImageUrl, type ProductColor } from '@/lib/colors';
@@ -45,8 +44,8 @@ export function ColorArt({ type, color, decorative = false }: {
     style={color ? { borderColor: color.swatch_hex } : undefined} />;
 }
 
-export function CartControls({ slug, name, color }: {
-  slug: string; name: string; color?: ProductColor;
+export function CartControls({ slug, name, color, showQuantity = true }: {
+  slug: string; name: string; color?: ProductColor; showQuantity?: boolean;
 }) {
   const { cart, changeQuantity } = useRackSession();
   const [notice, setNotice] = useState<{ x: number; y: number; label: string; id: number }>();
@@ -56,7 +55,7 @@ export function CartControls({ slug, name, color }: {
     const timer = setTimeout(() => setNotice(undefined), 2300);
     return () => clearTimeout(timer);
   }, [notice]);
-  if (!color) return null;
+  if (!color) return <button type="button" className="save-button" disabled>Add to cart</button>;
   const label = `${name}, ${color.name}`;
   const quantity = cart.find(line => line.slug === slug && line.color.slug === color.slug)?.quantity ?? 0;
 
@@ -74,12 +73,12 @@ export function CartControls({ slug, name, color }: {
   }
 
   return <div className="cart-controls">
-    <div className="quantity" role="group" aria-label={`${label} quantity in cart`}>
+    {showQuantity && <div className="quantity" role="group" aria-label={`${label} quantity in cart`}>
       <button type="button" disabled={quantity === 0} aria-label={`Decrease ${label} quantity`} onClick={event => change(-1, event)}>−</button>
       <output aria-label="Quantity">{quantity}</output>
       <button type="button" disabled={atLimit} aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
-    </div>
-    <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : <><ActionStar action="add"/>Add to cart</>}</button>
+    </div>}
+    <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : '+ Add to cart'}</button>
     <span className="sr-only" role="status">{notice?.label}</span>
     {notice && createPortal(
       <span key={notice.id} className="cart-notice" aria-hidden="true"

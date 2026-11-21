@@ -5,3 +5,5 @@ export const metadata: Metadata = { title: 'ODD OBJECTS | Drop 01', description:
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en"><body><div className="cloud-sky" aria-hidden="true"><i /><i /><i /></div><RackSessionProvider>{children}</RackSessionProvider></body></html>;
 }
+
+export const viewport = { viewportFit: 'cover' as const };

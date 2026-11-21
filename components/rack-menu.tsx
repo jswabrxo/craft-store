@@ -1,6 +1,5 @@
 'use client';
 
-import {ActionStar} from './action-star';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -82,7 +81,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
     <>
       <button ref={trigger} id="rack-menu-trigger" className="rack-menu-trigger" type="button"
         aria-haspopup="dialog" aria-expanded={open} aria-controls="rack-menu" onClick={openMenu}>
-        <ActionStar action="menu"/>Rack menu
+        <span aria-hidden="true">☰</span> Rack menu
       </button>
       <dialog ref={dialog} id="rack-menu" className={`rack-drawer${closing ? ' is-closing' : ''}`}
         aria-labelledby="rack-menu-title" onKeyDown={containFocus}
@@ -95,7 +94,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
         }}>
         <div className="drawer-header">
           <h2 id="rack-menu-title">Rack menu</h2>
-          <button type="button" className="drawer-close" onClick={() => closeMenu()}><ActionStar action="close"/>Close</button>
+          <button type="button" className="drawer-close" onClick={() => closeMenu()}><span aria-hidden="true">×</span> Close</button>
         </div>
         <nav aria-label="Rack navigation">
           <h3>Shelves</h3>
