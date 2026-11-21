@@ -2,6 +2,7 @@
 
 /* Supabase product photos are already sized and served by Storage. */
 /* eslint-disable @next/next/no-img-element */
+import {ActionStar} from './action-star';
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { colorImageUrl, type ProductColor } from '@/lib/colors';
@@ -78,7 +79,7 @@ export function CartControls({ slug, name, color }: {
       <output aria-label="Quantity">{quantity}</output>
       <button type="button" disabled={atLimit} aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
     </div>
-    <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : '+ Add to cart'}</button>
+    <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : <><ActionStar action="add"/>Add to cart</>}</button>
     <span className="sr-only" role="status">{notice?.label}</span>
     {notice && createPortal(
       <span key={notice.id} className="cart-notice" aria-hidden="true"

@@ -1,5 +1,6 @@
 'use client';
 
+import {ActionStar} from './action-star';
 import { useState } from 'react';
 import { api } from '@/lib/supabase';
 
@@ -19,7 +20,7 @@ export function RestockForm({product,color}: {product:string;color:string}) {
       } finally {setBusy(false);}
     }}>
       <label>Your email<input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
-      <button disabled={busy}><span className="button-icon" aria-hidden="true">◇</span>Notify me</button><span role="status">{message}</span>
+      <button disabled={busy}><ActionStar action="notify"/>Notify me</button><span role="status">{message}</span>
     </form>
   </details>;
 }
