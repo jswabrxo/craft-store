@@ -1,5 +1,6 @@
 'use client';
 
+import {ShopChime} from './shop-chime';
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
@@ -20,6 +21,7 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
   const { options, color, select } = useProductColor(slug);
 
   return <>
+    <div className="product-sound"><ShopChime/></div>
     <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
     <ProductGallery key={color?.slug} type={type} color={color} />
     <h1>{name}</h1>

@@ -34,8 +34,8 @@ export function DemoCheckout({total,children}:{total:number;children:ReactNode})
    </div>
  </div>
  <div className="checkout-actions cart-order-links" aria-label="Order actions">
-   <button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}><span className="button-icon" aria-hidden="true">⌕</span>Check status</button>
-   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}><span className="button-icon" aria-hidden="true">◷</span>View last order</button>
+   <button disabled={busy} aria-expanded={mode==='status'} onClick={()=>{setOrder(null);setMessage('');setMode(mode==='status'?null:'status');}}><OrderIcon kind="status"/>Check status</button>
+   <button disabled={busy} onClick={()=>{setMode(null);setOrder(null);const last=localStorage.getItem('odd-last-code');if(last){setCode(last);void lookup(last);}else setMessage('No saved order on this device.');}}><OrderIcon kind="history"/>View last order</button>
  </div>
  {mode==='checkout'&&total>0&&<form className="store-form checkout-panel" onSubmit={submit}>
    <h3>Order request</h3>
@@ -55,4 +55,17 @@ export function DemoCheckout({total,children}:{total:number;children:ReactNode})
  <p role="status">{message}</p>
  {order&&<section key={order.code+order.updated_at} className="order-result"><div><h3>Order details</h3><dl><dt>Private order code</dt><dd className="order-code">{order.code}</dd><dt>Amount</dt><dd>{peso(order.total_centavos/100)}</dd><dt>Created</dt><dd>{new Date(order.created_at).toLocaleString()}</dd></dl><button onClick={async()=>{try{await navigator.clipboard.writeText(order.code);setMessage('Copied. Paste this code in Check order status.');}catch{setMessage('Select and copy the order code above.');}}}><span className="button-icon" aria-hidden="true">▣</span>Copy order code</button></div><div><h3>Order progress</h3><p>◷ Payment<br/><strong>{order.payment_status==='cancelled'?'Cancelled':order.payment_status==='demo_confirmed'?'Marked confirmed':'Pending'}</strong></p><p>◇ Fulfillment<br/><strong>{order.order_status}</strong></p></div><p>Keep this code private. Paste it into “Check order status” on any device to see updates from the store.</p></section>}
  </div>;
+}
+
+function OrderIcon({kind}:{kind:'status'|'history'}) {
+  return <svg className="order-action-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false"
+    fill="var(--theme-surface, white)" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    {kind === 'status' ? <>
+      <path d="M8 5h14l4 4v17H8zM22 5v5h4"/>
+      <path d="m12 17 3 3 6-7" fill="none"/>
+    </> : <>
+      <circle cx="17" cy="16" r="10"/>
+      <path d="M17 10v6l4 3M4 8v6h6" fill="none"/>
+    </>}
+  </svg>;
 }

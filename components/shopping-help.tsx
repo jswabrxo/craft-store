@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import {useState} from 'react';
+import {useState,type CSSProperties} from 'react';
 import {useRackSession} from './rack-session';
-import {colorImageUrl, type ProductColor} from '@/lib/colors';
-import {CartControls,ColorChooser} from './color-controls';
+import {type ProductColor} from '@/lib/colors';
+import {CartControls,ColorChooser,ColorArt} from './color-controls';
 import {peso} from '@/lib/products';
 
 export function SizeHelper({sizing}:{sizing?:string}) {
@@ -32,26 +32,30 @@ export function MatchingPieces({slug,type}:{slug:string;type:string}) {
   const {catalog,colors}=useRackSession();
   const candidates=(catalog?.products??[]).filter(item=>item.slug!==slug&&
     (type.toLowerCase()==='bracelet'?item.type.toLowerCase()==='keychain':item.type.toLowerCase()==='bracelet'))
-    .map(item=>({item,options:(colors?.[item.slug]??[]).filter(c=>c.image_path&&c.stock_quantity!==0)}))
+    .map(item=>({item,options:(colors?.[item.slug]??[]).filter(c=>c.image_path)}))
     .filter(pair=>pair.options.length>0).slice(0,2);
   if(!candidates.length)return null;
   return <section className="shopping-help matching-section" aria-label="Matching pieces">
     <h2>{type.toLowerCase()==='bracelet'?'Clip on a matching piece':'Wear it with a bracelet'}</h2>
-    <p>Pick a color to build your own pair.</p>
+    <p>Pick an option to build your own pair.</p>
     <div className="matching-grid">{candidates.map(({item,options})=><MatchCard key={item.slug} item={item} options={options}/>)}</div>
+    <div className="shelf-edge" aria-hidden="true"/>
   </section>;
 }
 
-function MatchCard({item,options}:{item:{slug:string;name:string;price:number};options:ProductColor[]}) {
+function MatchCard({item,options}:{item:{slug:string;name:string;price:number;type:string};options:ProductColor[]}) {
   const [chosen,setChosen]=useState('');
   const color=options.find(c=>c.slug===chosen)??options[0];
   return <article className="matching-card">
-    <Link href={'/item/?product='+encodeURIComponent(item.slug)} aria-label={'View '+item.name}>
-      <img src={colorImageUrl(color.image_path!)} alt={color.image_alt??item.name+' in '+color.name}/>
-      <strong>{item.name}</strong>
-    </Link>
-    <span>{peso(item.price)}</span>
-    <ColorChooser slug={item.slug} name={item.name} options={options} color={color} select={setChosen}/>
+    <div className="rack-visual" style={{'--cage-swatch':color.swatch_hex} as CSSProperties}>
+      <div className="product-visual">
+        <Link className="image-box image-button" href={'/item/?product='+encodeURIComponent(item.slug)} aria-label={'View '+item.name}>
+          <div className="rack-color-slide is-preview"><ColorArt type={item.type} color={color} decorative/></div>
+        </Link>
+      </div>
+      <div className="rack-colors"><ColorChooser slug={item.slug} name={item.name} options={options} color={color} select={setChosen}/></div>
+    </div>
+    <div className="nameplate"><Link href={'/item/?product='+encodeURIComponent(item.slug)}>{item.name}</Link><span>{peso(item.price)}</span></div>
     <CartControls slug={item.slug} name={item.name} color={color}/>
   </article>;
 }

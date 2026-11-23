@@ -1,4 +1,5 @@
 'use client';
+import {ShopChime} from './shop-chime';
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { peso } from '@/lib/products';
@@ -96,7 +97,7 @@ export default function Rack() {
   return <main className="mx-auto max-w-3xl">
     <a className="skip" href="#collection" onClick={event => followSection(event, 'collection')}>Skip to collection</a>
     <nav className="topbar flex items-center justify-between" aria-label="Main"><a href="#cart" onClick={event => followSection(event, 'cart')}><CartIcon className="nav-cart-icon" /> Cart <span className="count">{count}</span></a><span className={`compact-drop${compactTitle ? ' is-visible' : ''}`} aria-hidden="true"><span className="dynamic-title">{drop?.title}</span></span>
-      <RackMenu onSectionNavigate={scrollToSection} /></nav>
+      <div className="rack-tools"><ShopChime/><RackMenu onSectionNavigate={scrollToSection} /></div></nav>
     <header className="hero text-center">
       <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
       <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />

@@ -14,19 +14,23 @@ export function ColorChooser({ slug, name, options, color, select }: {
   color?: ProductColor;
   select: (slug: string) => void;
 }) {
-  const { cart } = useRackSession();
+  const { cart, catalog } = useRackSession();
   if (!color) return null;
-  return <fieldset className="color-chooser" aria-label={`${name} color`}>
+  const variantLabel = catalog?.drop.theme['variant-label-'+slug]?.trim();
+  const sharesSwatch = (option: ProductColor) => options.some(other =>
+    other.slug !== option.slug && other.swatch_hex.toLowerCase() === option.swatch_hex.toLowerCase());
+  const label = variantLabel || (options.some(sharesSwatch) ? 'Style' : 'Color');
+  return <fieldset className="color-chooser" aria-label={`${name} ${label.toLowerCase()}`}>
     {options.map(option => {
       const count = cart.find(line => line.slug === slug && line.color.slug === option.slug)?.quantity ?? 0;
       return <button type="button" key={option.slug}
         style={{ '--swatch': option.swatch_hex } as CSSProperties}
         aria-label={count ? `${option.name}, ${count} in cart` : option.name} title={option.name} aria-pressed={option.slug === color.slug}
         onClick={() => select(option.slug)}>
-        ★{count > 0 && <span className="swatch-count" aria-hidden="true">{count}</span>}
+        <span aria-hidden="true">{variantLabel || sharesSwatch(option) ? '◆' : '★'}</span>{count > 0 && <span className="swatch-count" aria-hidden="true">{count}</span>}
       </button>;
     })}
-    <span className="color-caption">Color: {color.name}</span>
+    <span className="color-caption">{label}: {color.name}</span>
   </fieldset>;
 }
 
