@@ -4,3 +4,7 @@ out/
 *.tsbuildinfo
 .env*
 !.env.example
+
+.open-next/
+.wrangler/
+.dev.vars*
