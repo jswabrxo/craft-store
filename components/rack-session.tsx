@@ -31,7 +31,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    const refresh=()=>Promise.all([loadCatalog(),loadColors(controller.signal)]).then(([data,palette])=>{setCatalog(data);setColors(palette);setCatalogError('');}).catch(()=>setCatalogError('Unable to refresh the collection. Please reload to try again.'));
+    const refresh=()=>Promise.all([loadCatalog(new URLSearchParams(window.location.search).get("drop")),loadColors(controller.signal)]).then(([data,palette])=>{setCatalog(data);setColors(palette);setCatalogError('');}).catch(()=>setCatalogError('Unable to refresh the collection. Please reload to try again.'));
     void refresh();
     const timer=window.setInterval(refresh,30000);
     window.addEventListener('focus',refresh);
@@ -59,6 +59,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
     document.documentElement.style.setProperty('--heading-family',family);
     document.documentElement.style.setProperty('--body-family',catalog.drop.body_font_key==='serif'?'Georgia,serif':catalog.drop.body_font_key==='monospace'?'ui-monospace,monospace':'Arial,sans-serif');
     const root=document.documentElement;
+    root.dataset.storeTheme = catalog.drop.theme.layout ?? 'aero';
     const faces:FontFace[]=[];
     const links:HTMLLinkElement[]=[];
     let active=true;
@@ -79,6 +80,7 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
     document.title=catalog.drop.brand_name+' · '+catalog.drop.title;
     setCart(current=>current.filter(line=>catalog.products.some(p=>p.slug===line.slug)));
     return ()=>{
+      delete root.dataset.storeTheme;
       active=false;links.forEach(link=>link.remove());faces.forEach(face=>document.fonts.delete(face));
       for(const key of ['heading','body','button','label'])root.style.removeProperty('--'+key+'-family');
       for(const key of Object.keys(catalog.drop.theme))root.style.removeProperty('--theme-'+key);
@@ -97,11 +99,14 @@ export function RackSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const count = cart.reduce((total, line) => total + line.quantity, 0);
+  const picture = catalog?.drop.theme['background-image']?.trim();
+  const opacity = Number(catalog?.drop.theme['background-image-opacity'] ?? 18) || 18;
   return (
     <RackSessionContext.Provider value={{
       catalog,catalogError,cart, count, changeQuantity, colors, selectedColors, position,
       selectColor: (slug, color) => setSelectedColors(current => ({ ...current, [slug]: color })),
     }}>
+      {picture && /^https:\/\//i.test(picture) && <img className="faded-drop-background" src={picture} alt="" aria-hidden="true" style={{opacity: Math.min(40, Math.max(5, opacity))/100}}/>}
       {children}
     </RackSessionContext.Provider>
   );

@@ -24,18 +24,17 @@ export function ProductDetails({ slug, name: fallbackName, type: fallbackType, p
     <div className="product-sound"><ShopChime/></div>
     <div className="detail-colors"><ColorChooser slug={slug} name={name} options={options} color={color} select={select} /></div>
     <ProductGallery key={color?.slug} type={type} color={color} />
-    <h1>{name}</h1>
-    <p>{peso(price)} · Price</p>
+    <div className="product-heading"><h1 className="product-name">{name}</h1><p>{peso(price)}</p></div>
     <p>{item?.description??""}</p>
-    <p>{item?.materials}</p><p>{item?.sizing}</p>
+    <p>{item?.materials}</p>{item?.sizing && <p className="product-sizing">{item.sizing}</p>}
     {type.toLowerCase()==='bracelet'&&<SizeHelper sizing={item?.sizing}/>}
     <div className="product-cart">
-      {color && <RestockForm key={color.slug} product={slug} color={color.slug} />}
+      {color && catalog?.drop.is_active !== false && <RestockForm key={color.slug} product={slug} color={color.slug} />}
     </div>
     <PackagingPreview/>
     <MatchingPieces slug={slug} type={type}/>
     <div className="product-dock-space" aria-hidden="true"/>
-    {mounted && createPortal(
+    {mounted && catalog?.drop.is_active !== false && createPortal(
       <nav className="product-dock" aria-label="Product purchase actions">
         <CartControls slug={slug} name={name} color={color} showQuantity={false}/>
         {count > 0

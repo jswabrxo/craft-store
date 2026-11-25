@@ -1,5 +1,6 @@
 'use client';
 
+import { productPath } from '@/lib/catalog';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -103,7 +104,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
             jumpTo(shelf.id);
           }}><span>{shelf.label}</span></a>)}
           <h3>Pieces in {catalog?.drop.title}</h3>
-          {products.map(item => <Link key={item.slug} href={`/item/?product=${encodeURIComponent(item.slug)}`} onNavigate={event => {
+          {products.map(item => <Link key={item.slug} href={productPath(item.slug, catalog?.drop)} onNavigate={event => {
             event.preventDefault();
             closeMenu(() => {
               position.current = {
@@ -112,7 +113,7 @@ export default function RackMenu({ onSectionNavigate }: { onSectionNavigate: (id
                 url: window.location.href,
                 focusId: 'rack-menu-trigger',
               };
-              router.push(`/item/?product=${encodeURIComponent(item.slug)}`);
+              router.push(productPath(item.slug, catalog?.drop));
             });
           }}><span>{item.name}<small>{item.type}</small></span><span>{peso(item.price)}</span></Link>)}
           <a className="drawer-wishlist" href="#cart" onClick={event => {

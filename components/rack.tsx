@@ -1,4 +1,7 @@
 'use client';
+import { StoreLoading } from '@/components/store-loading';
+import { productPath } from '@/lib/catalog';
+import { ProfileComments, ProfilePost } from './profile-comments';
 import {ShopChime} from './shop-chime';
 import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import Link from 'next/link';
@@ -16,6 +19,8 @@ export default function Rack() {
   const { catalog, catalogError, cart, count, changeQuantity, position: positionRef } = useRackSession();
   const products=catalog?.products??[];
   const drop=catalog?.drop;
+  const sari = drop?.theme.layout === "sari-sari";
+  const retro=drop?.theme.layout === "profile";
   const [compactTitle, setCompactTitle] = useState(false);
   const cartItems = cart.flatMap(line => {
     const item = products.find(product => product.slug === line.slug);
@@ -94,13 +99,16 @@ export default function Rack() {
       }).then(remove).catch(() => {});
   }
 
+  if (!catalog) return <StoreLoading error={catalogError}/>;
   return <main className="mx-auto max-w-3xl">
     <a className="skip" href="#collection" onClick={event => followSection(event, 'collection')}>Skip to collection</a>
     <nav className="topbar flex items-center justify-between" aria-label="Main"><a href="#cart" onClick={event => followSection(event, 'cart')}><CartIcon className="nav-cart-icon" /> Cart <span className="count">{count}</span></a><span className={`compact-drop${compactTitle ? ' is-visible' : ''}`} aria-hidden="true"><span className="dynamic-title">{drop?.title}</span></span>
       <div className="rack-tools"><ShopChime/><RackMenu onSectionNavigate={scrollToSection} /></div></nav>
     <header className="hero text-center">
+      {retro && <div className="profile-strip"><strong>{drop.brand_name}</strong><nav aria-label="Profile tabs"><a href="#collection">Top Objects</a><a href="#about">About</a><a href="#cart">Cart ({count})</a></nav></div>}
+      {sari && <div className="tindahan-awning" aria-hidden="true"><i/><i/><i/></div>}
       <p className="eyebrow">{drop?.hero_eyebrow??"Loading collection…"}</p>
-      <h1 className="dynamic-title hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={drop?.theme["hero-sparkles"]!=="off"} /></h1><ClickDecoration theme={drop?.theme} /><FloatingStarBubble />
+      <h1 className="dynamic-title"><span className="hero-title-wrap">{drop?.title??"ODD OBJECTS"}<HeroSparkles enabled={!sari && drop?.theme["hero-sparkles"]!=="off"} /></span></h1><ClickDecoration theme={drop?.theme} />{!retro && !sari && <FloatingStarBubble />}
       <div className="drop-label">{drop?.preorder_details}</div>
       <p className="intro">{drop?.hero_copy}</p>
       <a className="browse" href="#collection" onClick={event => followSection(event, 'collection')}><span aria-hidden="true">↓</span> Browse {drop?.title??"collection"}</a>
@@ -118,7 +126,7 @@ export default function Rack() {
       </section>)}
       <section className="shelf wishlist" id="cart" tabIndex={-1} aria-labelledby="cart-title">
         <h3 id="cart-title">Your cart <span className="count">{count}</span></h3>
-        <DemoCheckout total={drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal}>
+        <DemoCheckout total={drop && (!drop.is_active || Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) ? 0 : subtotal}>
           <CartIcon className="tray-cart-icon" />
           {cartItems.length === 0 ? <div><p>Your cart is empty.</p><p className="muted">Tap “Add to cart” on a piece above.</p></div> :
             <ul>{cartItems.map(({ item, color, quantity }) => (
@@ -133,23 +141,37 @@ export default function Rack() {
               </li>
             ))}</ul>}
         {cartItems.length > 0 && <p className="cart-total">Subtotal <strong>{peso(subtotal)}</strong></p>}
-         {drop && (Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) && <p role="status">Preorders are closed.</p>}
+         {drop && (!drop.is_active || Date.parse(drop.preorder_opens_at??'')>Date.now() || Date.parse(drop.preorder_closes_at??'')<=Date.now()) && <p role="status">Preorders are closed.</p>}
         </DemoCheckout>
         <div className="shelf-edge" aria-hidden="true" />
       </section>
     </div>
     <section className="about-panel" id="about" tabIndex={-1} aria-labelledby="about-title">
-      <h2 id="about-title" className="dynamic-title">About {drop?.brand_name}</h2>
-      <p>{drop?.about_copy}</p>
+      {retro ? <>
+        <ProfilePost author={drop?.brand_name??'ODD OBJECTS'} body={drop?.about_copy} image={profileImage(drop?.theme['profile-image'])}/>
+        <ProfileComments/>
+      </> : <>
+        <h2 id="about-title" className="dynamic-title">About {drop?.brand_name??'ODD OBJECTS'}</h2>
+        <p>{drop?.about_copy}</p>
+      </>}
 
     </section>
-    <footer className="flex justify-between"><span className="mono">ODD OBJECTS</span><span>{drop?.title}</span></footer>
+    <nav className="other-drops" aria-label="Other drops">
+      <a href="/">Current drop</a><a href="/?drop=drop-04">Sari-Sari Counter</a><a href="/?drop=drop-05">Fiesta sa Kanto</a><a href="/?drop=drop-06">Last Trip</a>
+    </nav>
+    <footer className="flex justify-between"><span className="mono">{retro ? drop?.brand_name : "ODD OBJECTS"}</span><span>{drop?.title}</span></footer>
   </main>;
+}
+
+function profileImage(value?: string) {
+  const path = value?.trim();
+  return path && /^(https:\/\/|\/(?!\/))/.test(path) ? path : '/images/profile-brand.webp';
 }
 
 function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
   const { options, color, select } = useProductColor(item.slug);
-  const { position: positionRef } = useRackSession();
+  const { position: positionRef, catalog } = useRackSession();
+  const retro = catalog?.drop.theme.layout === "profile";
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const preview = previewIndex === null ? color : (options[previewIndex] ?? color);
   const previewing = previewIndex !== null;
@@ -163,7 +185,7 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
     return () => window.clearInterval(timer);
   }, [previewing, colorCount]);
 
-  const href = `/item/?product=${encodeURIComponent(item.slug)}`;
+  const href = productPath(item.slug, catalog?.drop);
   const linkId = `product-link-${item.slug}`;
   const imageId = `product-image-${item.slug}`;
 
@@ -171,10 +193,17 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
     positionRef.current = { slug: item.slug, scrollY: window.scrollY, url: window.location.href, focusId };
   }
 
-  return <article onPointerEnter={event => {
+  const nameplate = <div className="nameplate">
+      <Link id={linkId} href={href} onNavigate={() => rememberPosition(linkId)}>{item.name}</Link>
+      <span>{peso(item.price)}</span>
+    </div>;
+
+  return <article className="rack-post" onPointerEnter={event => {
     if (event.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches || colorCount < 2) return;
     setPreviewIndex(Math.max(0, options.findIndex(option => option.slug === color?.slug)));
   }} onPointerLeave={() => setPreviewIndex(null)}>
+    <div className={retro ? "profile-product-frame" : "contents"}>
+    {retro && nameplate}
     <div className="rack-visual" style={{"--cage-swatch":preview?.swatch_hex} as CSSProperties}>
       <span className="object-id mono">{item.object_code??item.slug}</span>
       <StockBadge color={preview} />
@@ -188,10 +217,8 @@ function RackCard({ item }: { item: import('@/lib/catalog').Product }) {
       </div>
       <div className="rack-colors"><ColorChooser slug={item.slug} name={item.name} options={options} color={preview} select={slug => { setPreviewIndex(null); select(slug); }} /></div>
     </div>
-    <div className="nameplate">
-      <Link id={linkId} href={href} onNavigate={() => rememberPosition(linkId)}>{item.name}</Link>
-      <span>{peso(item.price)}</span>
     </div>
+    {!retro && nameplate}
     <CartControls slug={item.slug} name={item.name} color={color} />
   </article>;
 }

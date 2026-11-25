@@ -7,6 +7,13 @@ import { createPortal } from 'react-dom';
 import { colorImageUrl, type ProductColor } from '@/lib/colors';
 import { useRackSession } from './rack-session';
 
+function SwatchShape({shape}: {shape?:ProductColor['shape']}) {
+  if(shape==='crescent') return <svg className="solid-crescent" viewBox="0 0 20 20" aria-hidden="true">
+    <path fill="currentColor" d="M12.4 1.6a8.6 8.6 0 1 0 6 12.7A8.1 8.1 0 0 1 12.4 1.6Z"/>
+  </svg>;
+  return <span aria-hidden="true">{{star:'★',diamond:'◆',triangle:'▲',square:'■',circle:'●'}[shape??'star']}</span>;
+}
+
 export function ColorChooser({ slug, name, options, color, select }: {
   slug: string;
   name: string;
@@ -17,9 +24,7 @@ export function ColorChooser({ slug, name, options, color, select }: {
   const { cart, catalog } = useRackSession();
   if (!color) return null;
   const variantLabel = catalog?.drop.theme['variant-label-'+slug]?.trim();
-  const sharesSwatch = (option: ProductColor) => options.some(other =>
-    other.slug !== option.slug && other.swatch_hex.toLowerCase() === option.swatch_hex.toLowerCase());
-  const label = variantLabel || (options.some(sharesSwatch) ? 'Style' : 'Color');
+  const label = variantLabel || (options.some(option => option.shape && option.shape !== 'star') ? 'Style' : 'Color');
   return <fieldset className="color-chooser" aria-label={`${name} ${label.toLowerCase()}`}>
     {options.map(option => {
       const count = cart.find(line => line.slug === slug && line.color.slug === option.slug)?.quantity ?? 0;
@@ -27,7 +32,7 @@ export function ColorChooser({ slug, name, options, color, select }: {
         style={{ '--swatch': option.swatch_hex } as CSSProperties}
         aria-label={count ? `${option.name}, ${count} in cart` : option.name} title={option.name} aria-pressed={option.slug === color.slug}
         onClick={() => select(option.slug)}>
-        <span aria-hidden="true">{variantLabel || sharesSwatch(option) ? '◆' : '★'}</span>{count > 0 && <span className="swatch-count" aria-hidden="true">{count}</span>}
+        <SwatchShape shape={option.shape}/>{count > 0 && <span className="swatch-count" aria-hidden="true">{count}</span>}
       </button>;
     })}
     <span className="color-caption">{label}: {color.name}</span>
@@ -44,6 +49,11 @@ export function ColorArt({ type, color, decorative = false }: {
       onError={() => setFailed(path)}
       alt={decorative ? '' : (color.image_alt || `${color.name} ${type.toLowerCase()}`)} />;
   }
+  if (color?.shape && color.shape !== 'star') {
+    return <span className="variant-art" aria-hidden="true" style={{color: color.swatch_hex}}>
+      <SwatchShape shape={color.shape}/>
+    </span>;
+  }
   return <span className={`shape ${type.toLowerCase()}`} aria-hidden="true"
     style={color ? { borderColor: color.swatch_hex } : undefined} />;
 }
@@ -51,7 +61,7 @@ export function ColorArt({ type, color, decorative = false }: {
 export function CartControls({ slug, name, color, showQuantity = true }: {
   slug: string; name: string; color?: ProductColor; showQuantity?: boolean;
 }) {
-  const { cart, changeQuantity } = useRackSession();
+  const { cart, changeQuantity, catalog } = useRackSession();
   const [notice, setNotice] = useState<{ x: number; y: number; label: string; id: number }>();
 
   useEffect(() => {
@@ -59,6 +69,7 @@ export function CartControls({ slug, name, color, showQuantity = true }: {
     const timer = setTimeout(() => setNotice(undefined), 2300);
     return () => clearTimeout(timer);
   }, [notice]);
+  if (catalog?.drop.is_active === false) return null;
   if (!color) return <button type="button" className="save-button" disabled>Add to cart</button>;
   const label = `${name}, ${color.name}`;
   const quantity = cart.find(line => line.slug === slug && line.color.slug === color.slug)?.quantity ?? 0;
@@ -78,9 +89,9 @@ export function CartControls({ slug, name, color, showQuantity = true }: {
 
   return <div className="cart-controls">
     {showQuantity && <div className="quantity" role="group" aria-label={`${label} quantity in cart`}>
-      <button type="button" disabled={quantity === 0} aria-label={`Decrease ${label} quantity`} onClick={event => change(-1, event)}>−</button>
+      <button type="button" disabled={quantity === 0} data-chime="down" aria-label={`Decrease ${label} quantity`} onClick={event => change(-1, event)}>−</button>
       <output aria-label="Quantity">{quantity}</output>
-      <button type="button" disabled={atLimit} aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
+      <button type="button" disabled={atLimit} data-chime="up" aria-label={`Increase ${label} quantity`} onClick={event => change(1, event)}>+</button>
     </div>}
     <button type="button" className="save-button" disabled={atLimit} onClick={event => change(1, event)}>{color.stock_quantity === 0 ? 'Sold out' : '+ Add to cart'}</button>
     <span className="sr-only" role="status">{notice?.label}</span>

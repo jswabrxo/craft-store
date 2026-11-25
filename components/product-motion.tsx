@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 
 export function RackMotion({productKey}:{productKey:string}) {
   useEffect(() => {
-    const images = document.querySelectorAll<HTMLElement>('#collection .product-visual');
+    const images = document.querySelectorAll<HTMLElement>('#collection .profile-product-frame, #collection .rack-post:not(:has(.profile-product-frame)) .product-visual');
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const cards=document.querySelectorAll<HTMLElement>('#collection .rack-visual');
+    const cards=document.querySelectorAll<HTMLElement>('#collection .profile-product-frame, #collection .rack-visual:not(.profile-product-frame .rack-visual)');
     const observer=typeof IntersectionObserver==='undefined'?null:new IntersectionObserver(entries=>{
       for(const entry of entries)if(entry.isIntersecting){
         if(!preference.matches && !entry.target.hasAttribute('data-revealed')){

@@ -14,24 +14,26 @@ export function ShopChime() {
     return () => { void audio.current?.close(); audio.current = null; };
   }, []);
 
-  function ring(purchase = false) {
+  function ring(kind: 'tap' | 'purchase' | 'up' | 'down' = 'tap') {
     try {
       const context = audio.current ??= new AudioContext();
       if (context.currentTime - last.current < .08 && context.currentTime > .08) return;
       last.current = context.currentTime;
       void context.resume().catch(() => {});
       const start = context.currentTime;
-      [purchase ? 784 : 660, purchase ? 1175 : 990].forEach((pitch, index) => {
+      const pitches = { tap: [660, 990], purchase: [784, 1175], up: [1047], down: [392] };
+      const duration = kind === 'up' || kind === 'down' ? .09 : .15;
+      pitches[kind].forEach((pitch, index) => {
         const offset = start + index * .035;
         const tone = context.createOscillator();
         const envelope = context.createGain();
         tone.frequency.value = pitch;
         envelope.gain.setValueAtTime(.001, offset);
         envelope.gain.exponentialRampToValueAtTime(index ? .018 : .034, offset + .009);
-        envelope.gain.exponentialRampToValueAtTime(.001, offset + .15);
+        envelope.gain.exponentialRampToValueAtTime(.001, offset + duration);
         tone.connect(envelope).connect(context.destination);
         tone.start(offset);
-        tone.stop(offset + .16);
+        tone.stop(offset + duration + .01);
         tone.onended = () => { tone.disconnect(); envelope.disconnect(); };
       });
     } catch {}
@@ -42,8 +44,11 @@ export function ShopChime() {
     const play = (event: MouseEvent) => {
       if (!(event.target instanceof Element)) return;
       const control = event.target.closest('button:not(:disabled), summary, a.product-dock-checkout');
-      if (control?.matches('.color-chooser button, .save-button, .rack-menu-trigger, .checkout-actions button, .product-dock-checkout, .shopping-help summary')) {
-        ring(control.matches('.save-button, .cart-checkout-primary, .product-dock-checkout'));
+      const chime = control?.getAttribute('data-chime');
+      if (chime === 'up' || chime === 'down') {
+        ring(chime);
+      } else if (control?.matches('.color-chooser button, .save-button, .rack-menu-trigger, .checkout-actions button, .product-dock-checkout, .shopping-help summary')) {
+        ring(control.matches('.save-button, .cart-checkout-primary, .product-dock-checkout') ? 'purchase' : 'tap');
       }
     };
     document.addEventListener('click', play, true);

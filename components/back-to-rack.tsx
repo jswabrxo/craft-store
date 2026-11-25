@@ -1,5 +1,6 @@
 'use client';
 
+import { dropPath } from '@/lib/catalog';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
@@ -11,7 +12,7 @@ export function BackToRack({ slug, shelf }: { slug: string; shelf: string }) {
   const { position,catalog } = useRackSession();
   const link = useRef<HTMLAnchorElement>(null);
   const leaving = useRef(false);
-  const href = `/#shelf-${shelf}`;
+  const href = `${dropPath(catalog?.drop)}#shelf-${shelf}`;
 
   return (
     <>

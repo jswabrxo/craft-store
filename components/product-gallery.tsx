@@ -6,16 +6,21 @@ import { ProductMagnifier } from './product-magnifier';
 import { StockBadge } from './stock-badge';
 
 export function ProductGallery({ color, type }: { color?: ProductColor; type: string }) {
-  const [lifestyle, setLifestyle] = useState(false);
+  const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const hasLifestyle = !!(color?.image_path && color.lifestyle_path);
+  const mockups = color?.mockup_paths?.filter(Boolean).slice(0, 4) ?? [];
+  const paths = mockups.length ? [color?.lifestyle_path, ...mockups] : [color?.image_path, color?.lifestyle_path];
+  const photos = [...new Set(paths.filter((path): path is string => !!path))];
+  const photoCount = photos.length;
+  const hasLifestyle = photoCount > 1;
+  const selected = index % Math.max(photoCount, 1);
   useEffect(() => {
-    if (!hasLifestyle || paused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = setInterval(() => setLifestyle(value => !value), 4500);
+    if (photoCount < 2 || paused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = setInterval(() => setIndex(value => (value + 1) % photoCount), 4500);
     return () => clearInterval(timer);
-  }, [hasLifestyle, paused]);
-  const main = color && lifestyle && color.lifestyle_path
-    ? { ...color, image_path: color.lifestyle_path, image_alt: type === 'Bracelet' ? 'Bracelet shown on a wrist' : 'Keychain shown clipped to a bag' }
+  }, [photoCount, paused]);
+  const main = color && photos[selected]
+    ? { ...color, image_path: photos[selected], image_alt: selected ? 'Product view '+(selected+1) : color.image_alt }
     : color;
 
   const frame = <div className="stock-frame"><ProductMagnifier type={type} color={main} animate={hasLifestyle} />
@@ -26,12 +31,12 @@ export function ProductGallery({ color, type }: { color?: ProductColor; type: st
         {paused ? <path d="M8 4l13 8-13 8z" /> : <path d="M7 5v14M17 5v14" />}
       </svg>
     </button>}<StockBadge color={color} /></div>;
-  if (!color?.image_path || !color.lifestyle_path) return frame;
-  return <div className="product-gallery">
+  if (!hasLifestyle) return frame;
+  return <div className="product-gallery" data-photos={photoCount}>
     <div className="gallery-rail" aria-label="Product photos">
-      {[color.image_path, color.lifestyle_path].map((path, index) => <button key={path} type="button"
-        aria-label={index ? 'Lifestyle photo' : 'Product photo'} aria-pressed={lifestyle === Boolean(index)}
-        onClick={() => { setLifestyle(Boolean(index)); setPaused(true); }}>
+      {photos.map((path, index) => <button key={index} type="button"
+        aria-label={'Product view '+(index+1)} aria-pressed={selected === index}
+        onClick={() => { setIndex(index); setPaused(true); }}>
         <img src={colorImageUrl(path)} alt="" />
       </button>)}
     </div>

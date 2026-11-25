@@ -1,5 +1,6 @@
 'use client';
 
+import { productPath } from '@/lib/catalog';
 import Link from 'next/link';
 import {useState,type CSSProperties} from 'react';
 import {useRackSession} from './rack-session';
@@ -39,23 +40,23 @@ export function MatchingPieces({slug,type}:{slug:string;type:string}) {
     <h2>{type.toLowerCase()==='bracelet'?'Clip on a matching piece':'Wear it with a bracelet'}</h2>
     <p>Pick an option to build your own pair.</p>
     <div className="matching-grid">{candidates.map(({item,options})=><MatchCard key={item.slug} item={item} options={options}/>)}</div>
-    <div className="shelf-edge" aria-hidden="true"/>
   </section>;
 }
 
 function MatchCard({item,options}:{item:{slug:string;name:string;price:number;type:string};options:ProductColor[]}) {
+  const {catalog}=useRackSession();
   const [chosen,setChosen]=useState('');
   const color=options.find(c=>c.slug===chosen)??options[0];
   return <article className="matching-card">
     <div className="rack-visual" style={{'--cage-swatch':color.swatch_hex} as CSSProperties}>
       <div className="product-visual">
-        <Link className="image-box image-button" href={'/item/?product='+encodeURIComponent(item.slug)} aria-label={'View '+item.name}>
+        <Link className="image-box image-button" href={productPath(item.slug, catalog?.drop)} aria-label={'View '+item.name}>
           <div className="rack-color-slide is-preview"><ColorArt type={item.type} color={color} decorative/></div>
         </Link>
       </div>
       <div className="rack-colors"><ColorChooser slug={item.slug} name={item.name} options={options} color={color} select={setChosen}/></div>
     </div>
-    <div className="nameplate"><Link href={'/item/?product='+encodeURIComponent(item.slug)}>{item.name}</Link><span>{peso(item.price)}</span></div>
+    <div className="nameplate"><Link href={productPath(item.slug, catalog?.drop)}>{item.name}</Link><span>{peso(item.price)}</span></div>
     <CartControls slug={item.slug} name={item.name} color={color}/>
   </article>;
 }

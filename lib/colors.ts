@@ -5,8 +5,10 @@ export type ProductColor = {
   slug: string;
   name: string;
   swatch_hex: string;
+  shape?: "star" | "diamond" | "crescent" | "triangle" | "square" | "circle";
   image_path: string | null;
   image_alt: string | null;
+  mockup_paths?: string[];
   lifestyle_path?: string | null;
   preorder_limit?: number | null;
   stock_quantity?: number | null;
@@ -26,7 +28,7 @@ export function colorImageUrl(path: string) {
 }
 
 export async function loadColors(signal: AbortSignal) {
-  const response = await fetch(projectUrl + '/rest/v1/product_colors?select=product_slug,slug,name,swatch_hex,image_path,image_alt,stock_quantity,low_stock_threshold,lifestyle_path,preorder_limit&order=display_order', {
+  const response = await fetch(projectUrl + '/rest/v1/product_colors?select=product_slug,slug,name,swatch_hex,shape,mockup_paths,image_path,image_alt,stock_quantity,low_stock_threshold,lifestyle_path,preorder_limit&order=display_order', {
     headers: { apikey: publishableKey }, cache: 'no-store', signal,
   });
   if (!response.ok) throw new Error('Unable to load product colors');

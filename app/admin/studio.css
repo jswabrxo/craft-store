@@ -11,3 +11,17 @@
 .studio-save { border-top:1px solid #bdd5ca;padding-top:12px; }
 .admin-page :is(.theme-editor,.palette-mixer,.font-settings) { min-width:0; }
 .admin-page .theme-editor { grid-template-columns:repeat(auto-fit,minmax(105px,1fr)); }
+
+.admin-page .editor-tabs { justify-content: flex-start; flex-wrap: wrap; }
+.admin-page .editor-tabs button[aria-pressed=true] { background:#1f6355; color:#fff; border-color:#1f6355; }
+.admin-page .variant-picker { display:grid; gap:5px; margin:12px 0; font-weight:700; }
+.admin-page .variant-picker select { min-width:0; max-width:100%; padding:8px; background:white; border:1px solid #91aaa4; border-radius:8px; }
+.admin-page .variant-picker small { font-weight:400; }
+.admin-page .variant-create,.admin-page .variant-advanced { border:1px solid #bdd5ca; border-radius:9px; padding:9px 12px; }
+.admin-page .variant-create > summary,.admin-page .variant-advanced > summary { cursor:pointer; font-weight:700; }
+.admin-page .variant-create form,.admin-page .variant-advanced[open] > :not(summary) { margin-top:10px; }
+.admin-page .variant-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:10px; }
+.admin-page .variant-fields > label { min-width:0; }
+@media (max-width: 600px) { .studio-toolbar { position:static; } }
+.admin-page .variant-help { grid-column:1 / -1; }
+.admin-page .variant-fields > :is(div,fieldset) { min-width:0; }
